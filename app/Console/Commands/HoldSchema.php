@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\DepositPeriod;
 use App\Models\SchemeType;
 use App\Models\SubscriptionHistory;
 use App\Models\UserSubscription;
@@ -40,56 +41,72 @@ class HoldSchema extends Command
     {
         try {
             $currentDate = now();
-            $subscriptionCount = UserSubscription::count();
+            $userSubscriptions = UserSubscription::with('scheme.schemeSetting', 'deposits')->where('is_closed', false)->get();
 
-            UserSubscription::with('scheme.schemeSetting')->chunk($subscriptionCount, function ($userSubscriptions) use ($currentDate) {
-                $userSubscriptions->each(function ($userSubscription) use ($currentDate) {
+            foreach ($userSubscriptions as $userSubscription) {
+                $startDate = Carbon::parse($userSubscription->start_date);
+                $endDate = Carbon::parse($userSubscription->end_date);
+                $holdDates = [];
+                $currentHoldDate = $startDate->copy();
 
-                    $startDate = Carbon::parse($userSubscription->start_date);
-                    $endDate = Carbon::parse($userSubscription->end_date);
-                    $holdDates = [];
-                    $currentHoldDate = $startDate->copy();
+                while ($currentHoldDate->lessThanOrEqualTo($endDate)) {
+                    $holdDates[] = $currentHoldDate->copy();
+                    $currentHoldDate->addMonthNoOverflow()->startOfMonth();
+                }
 
-                    while ($currentHoldDate->lessThanOrEqualTo($endDate)) {
-                        $holdDates[] = $currentHoldDate->copy();
-                        $currentHoldDate->addMonthNoOverflow()->startOfMonth();
+                Log::info("Hold Dates for Subscription ID {$userSubscription->id}: " . implode(', ', array_map(fn($date) => $date->format('Y-m-d'), $holdDates)));
+
+                foreach ($holdDates as $holdDate) {
+                    $duration = $userSubscription->scheme->schemeSetting->due_duration;
+                    $schemeType = SchemeType::find($userSubscription->scheme->scheme_type_id);
+                    $flexibility_duration = $schemeType ? $schemeType->flexibility_duration : 0;
+
+                    // Check unpaid periods
+
+                    $holdDateFixed = $holdDate->copy()->addDays($duration);
+                    $holdDateFlexible = $holdDate->copy()->addMonths($flexibility_duration)->addDays($duration);
+                    $totalFlexibleSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
+                        $query->where('subscription_id', $userSubscription->id);
+                        $query->where('status', true);
+                    })
+                        ->where('due_date', '>=', $startDate->format('Y-m-d'))
+                        ->where('due_date', '<', $holdDateFlexible->format('Y-m-d'))
+                        ->where('status', true)
+                        ->sum('scheme_amount');
+
+                    if (
+                        (
+                            $currentDate->diffInDays($holdDateFixed) >= $duration &&
+                            $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN &&
+                            $totalFlexibleSchemeAmount == 0
+                        ) ||
+                        (
+                            $currentDate->greaterThanOrEqualTo($holdDateFlexible) &&
+                            $userSubscription->scheme->scheme_type_id != SchemeType::FIXED_PLAN &&
+                            $totalFlexibleSchemeAmount == 0
+                        )
+                    ) {
+                        DB::transaction(function () use ($userSubscription, $currentDate, $startDate) {
+                            $userSubscription->update([
+                                'reason' => "The Subscription Hold Period for " . $startDate->format('d-M-Y') . " to after 15 days " . $currentDate->format('d-M-Y'),
+                                'status' => UserSubscription::STATUS_ONHOLD
+                            ]);
+
+                            SubscriptionHistory::updateOrCreate(
+                                ['subscription_id' => $userSubscription->id],
+                                [
+                                    'description' => "The Subscription Hold Period for " . $startDate->format('d-M-Y') . " to after 15 days " . $currentDate->format('d-M-Y'),
+                                    'status' => UserSubscription::STATUS_ONHOLD,
+                                    'is_closed' => false,
+                                ]
+                            );
+                        });
+
+                        Log::info("Subscription ID {$userSubscription->id} has been placed on hold as of {$currentDate->format('Y-m-d')}.");
                     }
-
-                    Log::info("Hold Dates for Subscription ID {$userSubscription->id}: " . implode(', ', array_map(fn($date) => $date->format('Y-m-d'), $holdDates)));
-
-                    collect($holdDates)->each(function ($holdDate) use ($currentDate, $userSubscription) {
-                        $duration = $userSubscription->scheme->schemeSetting->due_duration;
-                        $flexibility_duration = SchemeType::findOrFail($userSubscription->scheme->scheme_type_id)->flexibility_duration;
-
-                        if (
-                            $currentDate->greaterThanOrEqualTo($holdDate) &&
-                            $currentDate->diffInDays($holdDate) >= $duration &&
-                            $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN
-                            ||
-                            $currentDate->greaterThanOrEqualTo(
-                                $holdDate->addMonths($flexibility_duration)->addDays($duration)
-                            ) &&
-                            $userSubscription->scheme->scheme_type_id != SchemeType::FIXED_PLAN
-                        ) {
-                            DB::transaction(function () use ($userSubscription) {
-                                $userSubscription->update(['status' => UserSubscription::STATUS_ONHOLD]);
-
-                                SubscriptionHistory::updateOrCreate(
-                                    ['subscription_id' => $userSubscription->id],
-                                    [
-                                        'status' => UserSubscription::STATUS_ONHOLD,
-                                        'is_closed' => false,
-                                    ]
-                                );
-                            });
-
-                            Log::info("Subscription ID {$userSubscription->id} has been placed on hold as of {$currentDate->format('Y-m-d')}.");
-                        }
-                    });
-                });
-            });
+                }
+            }
         } catch (\Exception $e) {
-            // Log any errors
             Log::error('Error in Hold Scheme: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);

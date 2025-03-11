@@ -37,7 +37,7 @@
                   <select id="scheme_id" name="scheme_id" class="form-control @error('scheme_id') is-invalid @enderror">
                     <option value="" selected>Select Scheme</option>
                     @foreach($schemes as $scheme)
-                      <option <?= old('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{ $scheme->id }}">{{ $scheme->title }}</option>
+                      <option <?= old('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{ $scheme->id }}">{{ $scheme->title_en }}</option>
                     @endforeach
                   </select>
                   @error('scheme_id')

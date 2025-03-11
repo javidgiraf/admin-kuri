@@ -24,7 +24,7 @@ class SettingPostRequest extends FormRequest
     {
         return [
             'option_name' => ['required', Rule::unique('settings', 'option_name')],
-            'option_value' => ['required'],
+            'option_value' => ['nullable'],
         ];
     }
 }

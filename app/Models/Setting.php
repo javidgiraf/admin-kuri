@@ -17,6 +17,8 @@ class Setting extends Model
         'option_name',
         'option_code',
         'option_value',
+        'terms_and_conditions_en',
+        'terms_and_conditions_ml',
         'symbol',
         'status'
     ];

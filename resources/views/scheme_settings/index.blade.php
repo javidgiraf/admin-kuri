@@ -46,7 +46,7 @@
                 @foreach ($schemeSettings as $setting)
                 <tr>
                   <td>{{ $loop->iteration + ($schemeSettings->currentPage() - 1) * $schemeSettings->perPage() }}</td>
-                  <td>{{ $setting->scheme->title }}</td>
+                  <td>{{ $setting->scheme->title_en }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->max_payable_amount, 2) }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->min_payable_amount, 2) }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->denomination, 2) }}</td>

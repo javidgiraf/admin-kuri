@@ -70,7 +70,7 @@ class SchemeController extends Controller
             $request->file('pdf_file') : NULL;
         $scheme = $schemeService->getScheme($id);
         $schemeService->updateScheme($scheme, $input);
-        LogActivity::addToLog('Scheme ' . $input['title'] . ' updated by ' . auth()->user()->name);
+        LogActivity::addToLog('Scheme ' . $input['title_en'] . ' updated by ' . auth()->user()->name);
 
         return redirect()->route('schemes.index')->with('success', 'Scheme updated successfully');
     }

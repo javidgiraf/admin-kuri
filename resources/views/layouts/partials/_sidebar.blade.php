@@ -95,14 +95,14 @@
     </li>
     @endcan
 
-    @can(['transaction-details.index'])
+    <!-- @can(['transaction-details.index'])
     <li class="nav-item">
       <a class="nav-link {{ Route::is('transaction-details.*') ? '' : 'collapsed' }}" href="{{route('transaction-details.index')}}">
         <i class="bi bi-arrow-left-right"></i>
         <span>{{ __('Transaction Details') }}</span>
       </a>
     </li>
-    @endcan
+    @endcan -->
 
 
 

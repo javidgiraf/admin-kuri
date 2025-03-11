@@ -149,7 +149,7 @@ use App\Services\UserService;
 
                                         {{ ($user->UserSubscriptions->first()) ?
 
-                                                $user->UserSubscriptions->first()->scheme->title : '' }}
+                                                $user->UserSubscriptions->first()->scheme->title_en : '' }}
                                     </td>
                                     <td>{{ isset($user->customer) ? $user->customer->mobile : '' }}</td>
                                     <td>

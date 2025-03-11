@@ -23,14 +23,15 @@ class UserSubscription extends Model
         'end_date',
         'is_closed',
         'status',
-        'subscribe_amount'
+        'subscribe_amount',
+        'claim_date',
+        'claim_status'
     ];
 
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
-    
     public function scheme()
     {
         return $this->hasOne(Scheme::class, 'id', 'scheme_id');

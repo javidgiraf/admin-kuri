@@ -46,7 +46,7 @@
                                 <select wire:model="scheme_id" class="form-control" wire:change="scheme_table_filer" id="scheme_id">
                                     <option value="">Select scheme</option>
                                     @foreach($schemes as $scheme)
-                                    <option <?= request('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{$scheme->id}}">{{$scheme->title}}</option>
+                                    <option <?= request('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{$scheme->id}}">{{$scheme->title_en}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -95,7 +95,7 @@
 
 
                     <div style="overflow-x:auto;">
-                        <table class="table table-striped" style="width: 110%;" id="subscriptionsTable">
+                        <table class="table table-striped" style="width: 120%;" id="subscriptionsTable">
                             {{-- <div style='text-align: end' ;><a href="{{route('districts.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i><span>Add District</span></a>
                     </div> --}}
 
@@ -105,7 +105,7 @@
                             <th scope="col" width="10%">User</th>
                             <th scope="col">Scheme</th>
                             <th scope="col">Amount</th>
-                            <th scope="col">Collected</th>
+                            <th scope="col">Total Collected</th>
                             <th scope="col">Date Period</th>
                             <th scope="col">Closing Status</th>
                             <th scope="col">Status</th>
@@ -118,19 +118,43 @@
                         <tr>
                             <th scope="row">{{ $userSubscriptions->firstitem() + $loop->index }}</th>
                             <td>{{ $userSubscription->user?->name }}</td>
+                            @php
+                            $latestSubscription = App\Models\UserSubscription::where('user_id', $userSubscription->user_id)
+                            ->latest('created_at')
+                            ->first(); // Get the latest subscription (regardless of status)
+
+                            $latestClosedSubscription = App\Models\UserSubscription::where('user_id', $userSubscription->user_id)
+                            ->where('is_closed', true)
+                            ->latest('created_at')
+                            ->first(); // Get the latest closed subscription
+
+                            $hasActiveSubscription = App\Models\UserSubscription::where('user_id', $userSubscription->user_id)
+                            ->where('is_closed', false)
+                            ->exists();
+                            @endphp
                             <td>
-                                @if($userSubscription->status == $userSubscription::STATUS_DISCONTINUE || $userSubscription->is_closed == true)
-                                    <a class="changeSchemeBtn" data-subscription-id="{{ $userSubscription->id }}" data-scheme="{{ $userSubscription->scheme_id }}"
+                                {{$userSubscription->scheme?->title_en}}
+                                @if($latestSubscription && $userSubscription->id == $latestSubscription->id)
+                                @if($latestClosedSubscription && !$hasActiveSubscription)
+                                <br>
+                                <a class="changeSchemeBtn mt-2" data-subscription-id="{{ $userSubscription->id }}" data-scheme="{{ $userSubscription->scheme_id }}"
                                     data-reason="{{ $userSubscription->reason }}"
                                     data-bs-toggle="modal" data-bs-target="#changeSchemeModal"
-                                   style="cursor: pointer;">{{$userSubscription->scheme?->title}}</a>
-                                @else
-                                    {{$userSubscription->scheme?->title}}
-                               @endif
-                                    
+                                    style="cursor: pointer;">{{ __('Join New Scheme') }}</a>
+                                @endif
+                                @endif
                             </td>
 
-                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->subscribe_amount, 2) }}</td>
+                            <td>
+                                @if($userSubscription->scheme->scheme_type_id == App\Models\SchemeType::FIXED_PLAN)
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->subscribe_amount, 2) }}
+                                @else
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->schemeSetting->min_payable_amount, 2) }}
+                                -
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->schemeSetting->max_payable_amount, 2) }}
+                                @endif
+                            </td>
+
                             <td>
                                 @php $totalAmount = 0; @endphp
                                 @foreach($userSubscription->deposits as $deposit)
@@ -168,19 +192,36 @@
 
                             <td>
                                 <a data-subscription-id="{{ $userSubscription->id }}"
-                                   data-maturity-status="{{ $userSubscription->is_closed }}"
-                                   data-bs-toggle="modal" data-bs-target="#changeMaturityStatusModal"
-                                   style="cursor: pointer;" class="changeMaturityStatusBtn">
+                                    data-maturity-status="{{ $userSubscription->is_closed }}"
+                                    data-bs-toggle="modal" data-bs-target="#changeMaturityStatusModal"
+                                    style="<?= $userSubscription->is_closed == true ? 'pointer-events: none' : 'cursor: pointer' ?>" class="changeMaturityStatusBtn">
                                     <span data-subscription-id="{{ $userSubscription->id }}" data-maturity-status="{{ $userSubscription->is_closed }}" class="<?= $userSubscription->is_closed == '0' ? 'badge bg-primary' : "badge bg-danger" ?>">
                                         {{ $userSubscription->is_closed == '0' ? "Open" : "Closed" }}
                                     </span>
                                 </a>
+
+                                @if($userSubscription->is_closed == true)
+
+                                <div class="form-check form-switch mt-2">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="flexSwitchCheckChecked"
+                                        value="<?= ($userSubscription->claim_status == true) ? 0 : 1 ?>"
+                                        data-subscription-id="{{ $userSubscription->id }}"
+                                        <?= ($userSubscription->claim_status == true) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="flexSwitchCheckChecked">
+                                        <?= ($userSubscription->claim_status == true) ? 'Claimed' : 'Claim' ?>
+                                    </label>
+                                </div>
+                                @endif
                             </td>
 
-                            <td><a 
-                                    data-subscription-id="{{ $userSubscription->id }}" 
-                                    data-status="{{ $userSubscription->status }}" 
-                                    data-reason="{{ $userSubscription->reason }}" 
+                            <td><a
+                                    data-subscription-id="{{ $userSubscription->id }}"
+                                    data-status="{{ $userSubscription->status }}"
+                                    data-reason="{{ $userSubscription->reason }}"
                                     data-final-amount="{{ ($userSubscription->discontinue) ? $userSubscription->discontinue->final_amount : 0 }}"
                                     data-settlement-amount="{{ ($userSubscription->discontinue) ? $userSubscription->discontinue->settlement_amount : 0 }}"
                                     data-bs-toggle="modal" data-bs-target="#changeStatusModal" style="cursor: pointer;" class="changeStatusBtn">{!! $status !!}</a></td>
@@ -252,17 +293,17 @@
                     </div>
                     <div class="d-none" id="discontinue-details">
                         <h6 class="mt-3"><b>Discontinue Details</b></h6>
-                    
-                            <div class="form-group mt-2">
-                                <label>Final Amount</label>
-                                <input type="text" id="final_amount" name="final_amount" class="form-control mt-1" placeholder="Final Amount">
-                            </div>
-                            <div class="form-group mt-2">
-                                <label>Settlement Amount</label>
-                                <input type="text" id="settlement_amount" name="settlement_amount" class="form-control mt-1" placeholder="Settlement Amount">
-                            </div>
-                        
-                        
+
+                        <div class="form-group mt-2">
+                            <label>Final Amount</label>
+                            <input type="text" id="final_amount" name="final_amount" class="form-control mt-1" placeholder="Final Amount">
+                        </div>
+                        <div class="form-group mt-2">
+                            <label>Settlement Amount</label>
+                            <input type="text" id="settlement_amount" name="settlement_amount" class="form-control mt-1" placeholder="Settlement Amount">
+                        </div>
+
+
                     </div>
                     <div class="form-group mt-2">
                         <label>Reason</label>
@@ -308,7 +349,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="modal fade" id="changeSchemeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -322,28 +363,28 @@
                         <select class="form-control mt-1" id="scheme" name="scheme" style="width: 100%;">
                             <option value="">Select Scheme</option>
                             @foreach($schemes as $scheme)
-                                <option data-scheme-type="{{ $scheme->scheme_type_id }}" value="{{ $scheme->id }}">{{ $scheme->title }}</option>
+                            <option data-scheme-type="{{ $scheme->scheme_type_id }}" value="{{ $scheme->id }}">{{ $scheme->title_en }}</option>
                             @endforeach
                         </select>
                         <span class="changeSchemeError"></span>
                     </div>
-                    
+
                     <div class="form-group mt-3">
                         <label>Start Date <span class="text-danger">*</span></label>
 
                         <input type="date" class="form-control mt-1" name="start_date" id="start_date">
                         <span class="startDateError"></span>
                     </div>
-                    
-                    <div class="form-group mt-3 subscribeAmountDiv d-none">
-                <label>Subscribe Amount <span class="text-danger">*</span></label>
 
-                  <input type="text" class="form-control mt-1" name="subscribe_amount" id="subscribe_amount">
-                    <span class="subscribeAmountError"></span>
-                  
-              
-              </div>
-                                 
+                    <div class="form-group mt-3 subscribeAmountDiv d-none">
+                        <label>Subscribe Amount <span class="text-danger">*</span></label>
+
+                        <input type="text" class="form-control mt-1" name="subscribe_amount" id="subscribe_amount">
+                        <span class="subscribeAmountError"></span>
+
+
+                    </div>
+
                     <div class="form-group mt-2">
                         <label>Reason</label>
                         <textarea name="reason" id="reason" class="form-control mt-1"></textarea>
@@ -353,7 +394,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary updateBtn">Update</button>
+                    <button type="button" class="btn btn-primary updateBtn">Save</button>
                 </div>
             </div>
         </div>
@@ -436,11 +477,10 @@
         });
     });
 
-    $(document).on('change', '#subscription_status', function(){
-        if($(this).val() == <?= \App\Models\UserSubscription::STATUS_DISCONTINUE ?>) {
+    $(document).on('change', '#subscription_status', function() {
+        if ($(this).val() == <?= \App\Models\UserSubscription::STATUS_DISCONTINUE ?>) {
             $("#discontinue-details").removeClass('d-none');
-        }
-        else {
+        } else {
             $("#discontinue-details").addClass('d-none');
         }
     });
@@ -502,12 +542,11 @@
 
     $(document).on('click', '.changeMaturityStatusBtn', function() {
         let maturity_subscription_id = $(this).data('subscription-id');
-        let maturity_status = $(this).data('maturity-status'); 
+        let maturity_status = $(this).data('maturity-status');
         $("#maturity_subscription_id").val(maturity_subscription_id);
-        if(maturity_status == 1) {
+        if (maturity_status == 1) {
             $("#maturity_status").val(maturity_status).trigger('change');
-        }
-        else {
+        } else {
             $("#maturity_status").val("").trigger('change');
         }
     });
@@ -552,8 +591,8 @@
             }
         });
     });
-    
-      $("#subscriptionsTable").on('click', '.changeSchemeBtn', function() {
+
+    $("#subscriptionsTable").on('click', '.changeSchemeBtn', function() {
         let subscription_id = $(this).data('subscription-id');
         let scheme = $(this).data('scheme');
         let reason = $(this).data('reason');
@@ -563,39 +602,38 @@
         // $("#reason").val(reason);
 
     });
-    
 
-    $(document).on('change', '#scheme', function(){
-        
-      let schemeType = $(this).find("option:selected").data('scheme-type');
-      $("#schemeTypeId").val(schemeType);
-      
-      if(schemeType == <?= \App\Models\SchemeType::FIXED_PLAN ?>) {
-        $(".subscribeAmountDiv").removeClass('d-none');
-      }
-      else {
-        $(".subscribeAmountDiv").addClass('d-none');
-      }
+
+    $(document).on('change', '#scheme', function() {
+
+        let schemeType = $(this).find("option:selected").data('scheme-type');
+        $("#schemeTypeId").val(schemeType);
+
+        if (schemeType == <?= \App\Models\SchemeType::FIXED_PLAN ?>) {
+            $(".subscribeAmountDiv").removeClass('d-none');
+        } else {
+            $(".subscribeAmountDiv").addClass('d-none');
+        }
     });
-    
-    $("#changeSchemeModal").on('click', '.updateBtn', function(){
-        
-      $(".is-invalid").removeClass('is-invalid');
-      $(".invalid-feedback").removeClass('invalid-feedback').text("");
-        
-      let sub_id = $("#sub_id").val();
-      let scheme = $("#scheme").val();
-      let reason = $("#reason").val();
-      let subscribe_amount = $("#subscribe_amount").val();
-      let schemeType = $("#schemeTypeId").val();
-      let start_date = $("#start_date").val();
-      
-      if(subscribe_amount == "") {
-          $("#subscribe_amount").addClass('is-invalid');
-          $(".subscribeAmountError").addClass('invalid-feedback').text("The subscribe amount field is required");
-      }
-       
-      $.ajax({
+
+    $("#changeSchemeModal").on('click', '.updateBtn', function() {
+
+        $(".is-invalid").removeClass('is-invalid');
+        $(".invalid-feedback").removeClass('invalid-feedback').text("");
+
+        let sub_id = $("#sub_id").val();
+        let scheme = $("#scheme").val();
+        let reason = $("#reason").val();
+        let subscribe_amount = $("#subscribe_amount").val();
+        let schemeType = $("#schemeTypeId").val();
+        let start_date = $("#start_date").val();
+
+        if (subscribe_amount == "") {
+            $("#subscribe_amount").addClass('is-invalid');
+            $(".subscribeAmountError").addClass('invalid-feedback').text("The subscribe amount field is required");
+        }
+
+        $.ajax({
             url: "{{ route('change-scheme') }}",
             type: "POST",
             data: {
@@ -611,29 +649,66 @@
             success: function(response) {
                 $("#changeSchemeModal").modal('hide');
                 toastr.success(response.message);
-                
-                setTimeout(function(){
+
+                setTimeout(function() {
                     location.reload();
                 }, 2000);
             },
             error: function(error) {
                 console.log(error);
-                if(error.responseJSON.errors.scheme) {
+
+                if (error.responseJSON && error.responseJSON.message) {
+                    toastr.error(error.responseJSON.message);
+                }
+
+                if (error.responseJSON.errors.scheme) {
                     $("#scheme").addClass('is-invalid');
                     $(".changeSchemeError").addClass('invalid-feedback').text(error.responseJSON.errors.scheme[0]);
                 }
-                
-                if(error.responseJSON.errors.start_date) {
+
+                if (error.responseJSON.errors.start_date) {
                     $("#start_date").addClass('is-invalid');
                     $(".startDateError").addClass('invalid-feedback').text(error.responseJSON.errors.start_date[0]);
                 }
-                
-                if(error.responseJSON.errors.start_date) {
+
+                if (error.responseJSON.errors.subscribe_amount) {
                     $("#subscribe_amount").addClass('is-invalid');
                     $(".subscribeAmountError").addClass('invalid-feedback').text(error.responseJSON.errors.subscribe_amount[0]);
                 }
             }
-      });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkboxes = document.querySelectorAll('.form-check-input');
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', (event) => {
+                const label = event.target.nextElementSibling; // The label right after the checkbox
+                label.textContent = event.target.checked ? 'Claimed' : 'Claim';
+            });
+        });
+    });
+
+    $(document).on('change', '#flexSwitchCheckChecked', function() {
+        let subscription_id = $(this).data('subscription-id');
+        let status = $(this).val();
+
+        $.ajax({
+            url: "{{ route('update-claim-status') }}",
+            type: "POST",
+            data: {
+                subscription_id: subscription_id,
+                status: status,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                toastr.success(response.message);
+            },
+            error: function(error) {
+
+            }
+        });
     });
 </script>
 @endpush

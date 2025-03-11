@@ -23,10 +23,16 @@ class SchemeUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', Rule::unique('schemes', 'title')->ignore(decrypt($this->route('scheme')))],
+            'title_en' => ['required', Rule::unique('schemes', 'title_en')->ignore(decrypt($this->route('scheme')))],
+            'title_ml' => ['required', Rule::unique('schemes', 'title_ml')->ignore(decrypt($this->route('scheme')))],
             'total_period' => ['required', 'numeric'],
             'scheme_type_id' => ['required', Rule::exists('scheme_types', 'id')],
-            'pdf_file' => ['nullable', 'file', 'mimes:pdf']
+            'payment_terms_en' => ['required'],
+            'description_en' => ['required'],
+            'terms_and_conditions_en' => ['required'],
+            'payment_terms_ml' => ['required'],
+            'description_ml' => ['required'],
+            'terms_and_conditions_ml' => ['required']
         ];
     }
 }

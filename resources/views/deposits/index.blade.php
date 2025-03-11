@@ -137,16 +137,15 @@
             $("#payment_method").addClass('is-invalid');
             $(".payment_method").addClass('invalid-feedback').text("Please enter Payment Method!");
             return false;
-        } else {
-            if ($("#payment_method").val() != "cash") {
-
-                if ($("#transaction_no").val() == "") {
-                    $("#transaction_no").addClass('is-invalid');
-                    $(".transaction_no").addClass('invalid-feedback').text("Please enter Transaction No!");
-                    return false;
-                }
-            }
         }
+
+        // if ($("#payment_method").val() != "cash" && $("#transaction_no").val() == "") {
+        //     $("#transaction_no").addClass('is-invalid');
+        //     $(".transaction_no").addClass('invalid-feedback').text("Please enter Transaction No!");
+        //     return false;
+
+        // }
+
 
 
 
@@ -161,9 +160,12 @@
         //     $("#frmtrasaction").addClass('alert alert-danger').text("Please upload Receipt!");
         //     return false;
         // }
+
+
         formData.append('subscription_id', user_subscription_id);
         formData.append('totalAmount', totalAmount);
         formData.append('checkdata', jsonData);
+
         // formData.append('_token', '{{ csrf_token() }}');
 
         $.ajax({
@@ -217,7 +219,7 @@
                     $(".transaction_no").addClass('invalid-feedback').text(data.responseJSON.errors.transaction_no[0]);
                     return false;
                 } else {
-                    toastr.error('Validation error occurred: ' + (data.responseJSON.message || 'Please try again.'));
+                    toastr.error(data.responseJSON.message);
                     $("#exampleModal").modal('hide');
                     $("#permissionsTable tbody").empty();
                     return false;

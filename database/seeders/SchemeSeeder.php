@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\SchemeType;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,28 +15,36 @@ class SchemeSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $schemes = [
+            [
+                'title' => 'Fixed Payment Scheme',
+                'total_period' => '15',
+                'scheme_type_id' => SchemeType::FIXED_PLAN,
+                'status' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+
+            ],
+            [
+                'title' => 'Flexible Payment Scheme',
+                'total_period' => '15',
+                'scheme_type_id' => SchemeType::FLEXIBLE_PLAN,
+                'status' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'title' => 'Easy Gold Scheme',
+                'total_period' => '15',
+                'scheme_type_id' => SchemeType::GOLD_PLAN,
+                'status' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+        ];
         
-        $schemes =[[
-            'title' => 'Wedding Plan',
-            'total_amount' => "300000.00",
-            'total_period' => '10',
-            'schedule_amount' => '2500.00',
-            'description' => ''
-
-        ],[
-            'title' => 'Plan B',
-            'total_amount' => "150000.00",
-            'total_period' => '4',
-            'schedule_amount' => '1000.00',
-            'description' => ''
-
-        ],
-       ];
-       foreach($schemes as $scheme)
-       {
-        $scheme['total_period']= $scheme['total_period'] * 12;
-        DB::table('schemes')->insert($scheme);
-
-      }
+        DB::table('schemes')->insert($schemes);
+        
     }
 }

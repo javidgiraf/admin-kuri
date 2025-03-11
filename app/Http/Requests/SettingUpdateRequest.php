@@ -26,7 +26,7 @@ class SettingUpdateRequest extends FormRequest
 
         return [
             'option_name' => ['required', Rule::unique('settings', 'option_name')->ignore(decrypt($id))],
-            'option_value' => ['required'],
+            'option_value' => ['nullable'],
         ];
     }
 }

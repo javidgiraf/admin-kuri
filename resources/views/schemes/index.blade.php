@@ -42,7 +42,7 @@
                                 @foreach($schemes as $scheme)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{$scheme->title}}</td>
+                                    <td>{{$scheme->title_en}}</td>
                                     <td>{{ $scheme->schemeType?->title }}</td>
                                     <td>{{$scheme->total_period}}</td>
                                     <td>

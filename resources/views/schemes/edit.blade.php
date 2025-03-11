@@ -28,10 +28,19 @@
               @csrf
               @method('patch')
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Title <span class="text-danger">*</span></label>
+                <label for="inputText" class="col-sm-2 col-form-label">Title English<span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                  <input type="text" id="title" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $scheme->title) }}" placeholder="Enter New Scheme">
-                  @error('title')
+                  <input type="text" id="title_en" name="title_en" class="form-control @error('title_en') is-invalid @enderror" value="{{ old('title_en', $scheme->title_en) }}" placeholder="Enter New Scheme">
+                  @error('title_en')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Title Malayalam<span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <input type="text" id="title_ml" name="title_ml" class="form-control @error('title_ml') is-invalid @enderror" value="{{old('title_ml', $scheme->title_ml)}}" placeholder="Title Malayalam">
+                  @error('title_ml')
                   <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
                 </div>
@@ -65,25 +74,69 @@
               </div>
 
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Upload File </label>
-                <div class="col-sm-10">
-                  <div class="mb-3">
 
-                    <input class="form-control @error('pdf_file') is-invalid @enderror" type="file" name="pdf_file" id="schemeFile">
-                  </div>
-                  
-                  @error('pdf_file')
-                    <span class="invalid-feedback">{{ $message }}</span>
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Payment Terms English') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="payment_terms_en" name="payment_terms_en" class="form-control basic-example @error('payment_terms_en') is-invalid @enderror" placeholder="{{ __('Payment Terms English') }}">{!! old('payment_terms_en', $scheme->payment_terms_en) !!}</textarea>
+                  @error('payment_terms_en')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="row mb-3">
+
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Payment Terms Malayalam') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="payment_terms_ml" name="payment_terms_ml" class="form-control basic-example @error('payment_terms_ml') is-invalid @enderror" placeholder="{{ __('Payment Terms Malayalam') }}">{!! old('payment_terms_ml', $scheme->payment_terms_ml) !!}</textarea>
+                  @error('payment_terms_ml')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="row mb-3">
+
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Description English') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="description_en" name="description_en" class="form-control basic-example @error('description_en') is-invalid @enderror" placeholder="Description English">{!! old('description_en', $scheme->description_en) !!}</textarea>
+                  @error('description_en')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+
+              </div>
+              <div class="row mb-3">
+
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Description Malayalam') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="description_ml" name="description_ml" class="form-control basic-example @error('description_ml') is-invalid @enderror" placeholder="{{ __('Description Malayalam') }}">{!! old('description_ml', $scheme->description_ml) !!}</textarea>
+                  @error('description_ml')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+
+              </div>
+              <div class="row mb-3">
+
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Terms & Conditions English') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="terms_and_conditions_en" name="terms_and_conditions_en" class="form-control basic-example @error('terms_and_conditions_en') is-invalid @enderror" placeholder="{{ __('Terms & Conditions English') }}">{!! old('terms_and_conditions_en', $scheme->terms_and_conditions_en) !!}</textarea>
+                  @error('terms_and_conditions_en')
+                  <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+
+              </div>
+              <div class="row mb-3">
+
+                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Terms & Conditions Malayalam') }} <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                  <textarea id="terms_and_conditions_ml" name="terms_and_conditions_ml" class="form-control basic-example @error('terms_and_conditions_ml') is-invalid @enderror" placeholder="{{ __('Terms & Conditions Malayalam') }}">{!! old('terms_and_conditions_ml', $scheme->terms_and_conditions_ml) !!}</textarea>
+                  @error('terms_and_conditions_ml')
+                  <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
                 </div>
               </div>
 
-              <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Description</label>
-                <div class="col-sm-10">
-                  <textarea id="title" name="description" class="form-control basic-example" placeholder="Description"> {!! $scheme->description !!}</textarea>
-                </div>
-              </div>
               <fieldset class="row mb-3">
                 <legend class="col-form-label col-sm-2 pt-0">Status <span class="text-danger">*</span></legend>
                 <div class="col-sm-2">

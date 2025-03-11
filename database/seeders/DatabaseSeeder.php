@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
         // $this->call(DistrictSeeder::class);
         // $this->call(GoldRateSeeder::class);
         // $this->call(SchemeTypeSeeder::class);
+        // $this->call(SchemeSeeder::class);
+        // $this->call(SettingSeeder::class);
+        // $this->call(SchemeSettingSeeder::class);
     }
 }

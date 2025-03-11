@@ -56,7 +56,7 @@ class UserSubscriptionFilter extends Component
         $users =  $this->users();
         $schemes =  $this->schemes();
 
-        $query = UserSubscription::query();
+        $query = UserSubscription::query()->with('schemeSetting');
         if (isset($this->user_id)) {
 
             $query->where('user_id',  $this->user_id);
@@ -93,7 +93,7 @@ class UserSubscriptionFilter extends Component
 
         $users = User::whereHas('roles', function ($query) {
             $query->whereName('customer');
-        })->with('roles')->with('customer')->get();
+        })->with('roles')->with('customer')->where('is_admin', false)->get();
         return  $users;
     }
 

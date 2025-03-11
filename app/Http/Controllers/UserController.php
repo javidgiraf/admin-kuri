@@ -18,6 +18,7 @@ use App\Models\DepositPeriod;
 use App\Models\Discontinue;
 use App\Models\Deposit;
 use App\Models\Scheme;
+use App\Models\SchemeType;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -205,8 +206,13 @@ class UserController extends Controller
         $user_subscription_id = decrypt($input['user_subscription_id']);
 
         $user_id = decrypt($input['user_id']);
-        $scheme = UserSubscription::where('id', $user_subscription_id)->first();
-        $scheme_id =  $scheme->scheme_id;
+        $userSubscription = UserSubscription::with('scheme.schemeType')->where('is_closed', false)->findOrFail($user_subscription_id);
+        $scheme_id =  $userSubscription->scheme_id;
+        $currentDate = now();
+        $startDate = Carbon::parse($userSubscription->start_date);
+        $endDate = Carbon::parse($userSubscription->end_date);
+        $flexibility_duration = $userSubscription->scheme->schemeType->flexibility_duration;
+        $endSixMonthPeriod = $startDate->copy()->addMonths($flexibility_duration);
 
         $current_plan_history = $userService->getCurrentPlanHistory($user_subscription_id, $user_id, $scheme_id);
 
@@ -217,7 +223,7 @@ class UserController extends Controller
             ->latest()->get();
 
         $data2 =  view('partials._unpaid_list_details_for_deposit')
-            ->with(compact('current_plan_history', 'user_subscription_id', 'scheme_id', 'depositPeriods'))
+            ->with(compact('current_plan_history', 'user_subscription_id', 'scheme_id', 'depositPeriods', 'currentDate', 'startDate', 'endSixMonthPeriod', 'flexibility_duration'))
             ->render();
 
         return response()->json(['data' => $data2]);
@@ -268,6 +274,7 @@ class UserController extends Controller
     public function payDeposit(DepositPostRequest $request, UserService $userService)
     {
         $input = $request->all();
+
         $input['subscription_id'] = decrypt($input['subscription_id']);
         $deposit = $userService->payDeposit($input);
         $input['deposit_id'] = $deposit->id;
@@ -275,7 +282,7 @@ class UserController extends Controller
         $userService->saveTransactionHistory($input, $receipt_upload);
         $userService->saveBankTransfers($input, $receipt_upload);
         $totalSchemeAmount = Deposit::whereSubscriptionId($input['subscription_id'])->sum('total_scheme_amount');
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Payment successfully completed',
@@ -505,6 +512,7 @@ class UserController extends Controller
         }
 
         $userSubscription = UserSubscription::findOrFail($inputs['subscription_id']);
+
         $userSubscription->reason = $inputs['maturity_reason'];
         $userSubscription->is_closed = $inputs['maturity_status'];
         $userSubscription->update();
@@ -512,7 +520,8 @@ class UserController extends Controller
         SubscriptionHistory::whereSubscriptionId($inputs['subscription_id'])
             ->update([
                 'is_closed' => $inputs['maturity_status'],
-                'description' => $inputs['maturity_reason']
+                'description' => $inputs['maturity_reason'],
+                'status' => $userSubscription->status
             ]);
 
         return response()->json(['success' => true, 'message' => 'Maturity Status changed successfully', 'data' => $userSubscription]);
@@ -522,13 +531,17 @@ class UserController extends Controller
     {
         $inputs = $request->all();
 
-        // Validate the inputs
-        $validator = Validator::make($inputs, [
-
-            'scheme' => ['required', Rule::exists('schemes', 'id')], // Validate scheme ID
+        $rules = [
+            'scheme' => ['required', Rule::exists('schemes', 'id')],
             'start_date' => ['required', 'date'],
-            'subscribe_amount' => ['nullable', 'numeric']
-        ]);
+            'subscribe_amount' => ['nullable'],
+        ];
+
+        if ($inputs['scheme'] == SchemeType::FIXED_PLAN) {
+            $rules['subscribe_amount'] = ['required', 'numeric'];
+        }
+
+        $validator = Validator::make($inputs, $rules);
 
         // Return validation errors if validation fails
         if ($validator->fails()) {
@@ -539,28 +552,72 @@ class UserController extends Controller
         }
 
         try {
-            // Find the scheme
+
             $scheme = Scheme::findOrFail($inputs['scheme']);
-            $total_period = $scheme->total_period;
+            $startDate = Carbon::parse($inputs['start_date']);
 
-            // Parse and validate the start_date
-            $start_date = Carbon::parse($inputs['start_date']);
-            $end_date = $start_date->copy()->addMonths($total_period - 1)->lastOfMonth();
+            $total_period = ($startDate->format('d') > 15) ? $scheme->total_period : ($scheme->total_period - 1);
+            $subscriptionStart = ($startDate->format('d') > 15) ?
+                $startDate->copy()->addMonths(1)->firstOfMonth()
+                : $startDate->copy()->firstOfMonth();
 
-            // Update the user subscription
+            $subscriptionEnd = $startDate->copy()->addMonths($total_period)->lastOfMonth();
+
             $userSubscription = UserSubscription::findOrFail($inputs['sub_id']);
-            $userSubscription->update([
+
+            $totalSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
+                $query->where('subscription_id', $userSubscription->id);
+            })
+            ->sum('scheme_amount');
+
+            if (UserSubscription::where('user_id', $userSubscription['user_id'])
+                ->where('scheme_id', $inputs['scheme'])
+                ->where('start_date', '>=', $subscriptionStart->format('Y-m-d')) // Start date should be before or on the given date
+                ->where('end_date', '<=', $subscriptionEnd->format('Y-m-d')) // End date should be after or on the given date
+                ->exists() && $totalSchemeAmount != 0
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are already joined for same date range'
+                ], 400);
+            }
+
+            if (UserSubscription::where('user_id', $userSubscription['user_id'])
+                ->where('is_closed', false)->exists()
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Already joined new scheme'
+                ], 400);
+            }
+
+            $closedSubscription = UserSubscription::where('user_id', $userSubscription->user_id)
+                ->where('scheme_id', $userSubscription->scheme_id)
+                ->where('is_closed', true)
+                ->findOrFail($userSubscription->id);
+
+            $totalSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($closedSubscription) {
+                $query->where('subscription_id', $closedSubscription->id);
+            })
+            ->sum('scheme_amount');
+
+            if($totalSchemeAmount == 0) {
+                $closedSubscription->delete();
+            }
+
+            UserSubscription::create([
+                'user_id' => $userSubscription['user_id'],
                 'subscribe_amount' => $inputs['subscribe_amount'] ?? 0,
                 'scheme_id' => $inputs['scheme'],
-                'start_date' => $start_date->format('Y-m-d'),
-                'end_date' => $end_date->format('Y-m-d'),
-                'status' => true, // Ensure status is active
-                'is_closed' => false // Ensure the scheme is not closed
+                'start_date' => $subscriptionStart->format('Y-m-d'),
+                'end_date' => $subscriptionEnd->format('Y-m-d'),
+                'status' => true
             ]);
+
 
             return response()->json([
                 'success' => true,
-                'message' => 'Scheme Changed Successfully'
+                'message' => 'New scheme joined Successfully'
             ]);
         } catch (\Exception $e) {
             // Handle any unexpected errors
@@ -570,5 +627,19 @@ class UserController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function updateClaimStatus(Request $request)
+    {
+        UserSubscription::findOrFail($request->subscription_id)
+            ->update([
+                'claim_date' => now()->format('Y-m-d'),
+                'claim_status' => $request->status
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Claim status updated'
+        ]);
     }
 }

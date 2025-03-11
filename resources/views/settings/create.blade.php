@@ -45,6 +45,32 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Language <span class="text-danger">*</span></label>
+                                <div class="col-sm-10">
+                                    <select class="form-control select2 @error('language') is-invalid @enderror" name="language">
+                                        <option selected disabled>Choose Language</option>
+                                        
+                                            <option value="en">{{ __('English') }}</option>
+                                            <option value="ml">{{ __('Malayalam') }}</option>
+                                        
+                                    </select>
+                                    @error('language')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+
+                                <label for="inputText" class="col-sm-2 col-form-label">{{ __('Terms & Conditions') }} <span class="text-danger">*</span></label>
+                                <div class="col-sm-10">
+                                    <textarea id="terms_and_conditions" name="terms_and_conditions" class="form-control basic-example @error('terms_and_conditions') is-invalid @enderror" placeholder="{{ __('Terms & Conditions') }}">{!! old('terms_and_conditions') !!}</textarea>
+                                </div>
+                                @error('terms_and_conditions')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
 
                             <fieldset class="row mb-3">
                                 <legend class="col-form-label col-sm-2 pt-0">Status <span class="text-danger">*</span></legend>
@@ -83,3 +109,75 @@
 </main>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.7.2/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea.basic-example',
+        plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
+        menubar: 'file edit view insert format tools table help',
+        toolbar: "undo redo | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl",
+
+        menubar: false,
+        toolbar_items_size: 'small',
+
+        style_formats: [{
+                title: 'Bold text',
+                inline: 'b'
+            },
+            {
+                title: 'Red text',
+                inline: 'span',
+                styles: {
+                    color: '#ff0000'
+                }
+            },
+            {
+                title: 'Red header',
+                block: 'h1',
+                styles: {
+                    color: '#ff0000'
+                }
+            },
+            {
+                title: 'Example 1',
+                inline: 'span',
+                classes: 'example1'
+            },
+            {
+                title: 'Example 2',
+                inline: 'span',
+                classes: 'example2'
+            },
+            {
+                title: 'Table styles'
+            },
+            {
+                title: 'Table row 1',
+                selector: 'tr',
+                classes: 'tablerow1'
+            }
+        ],
+
+        templates: [{
+                title: 'Test template 1',
+                content: 'Test 1'
+            },
+            {
+                title: 'Test template 2',
+                content: 'Test 2'
+            }
+        ],
+        setup: function(ed) {
+            ed.on('change', function(e) {
+                tinyMCE.triggerSave();
+            });
+        }
+    });
+
+    $(function() {
+        $(".select2").select2();
+    });
+</script>
+@endpush

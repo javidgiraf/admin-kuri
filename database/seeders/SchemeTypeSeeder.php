@@ -38,7 +38,7 @@ class SchemeTypeSeeder extends Seeder
             [
                 'title' => 'Gold Plan',
                 'shortcode' => 'Gold',
-                'flexibility_duration' => 6,  // Assuming 6 months for the Gold Plan
+                'flexibility_duration' => 6,
                 'status' => true,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

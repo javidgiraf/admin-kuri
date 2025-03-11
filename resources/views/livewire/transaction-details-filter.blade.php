@@ -142,7 +142,7 @@
                         </a>
                     </td>
                     <td>{{ date('d/m/Y', strtotime($transactionDetail->deposit?->paid_at)) }}</td>
-                    <td>{{ $transactionDetail->deposit?->subscription?->scheme?->title }}</td>
+                    <td>{{ $transactionDetail->deposit?->subscription?->scheme?->title_en }}</td>
 
                     <td>
                         {{ \App\Models\Setting::CURRENCY }} {{ number_format($transactionDetail->deposit?->total_scheme_amount, 2) }}

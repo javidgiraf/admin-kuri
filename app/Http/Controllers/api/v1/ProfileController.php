@@ -459,8 +459,8 @@ class ProfileController extends Controller
     ->first();
     
     $deposit_ids = $userSubscription->deposits->pluck('id') ?? null;
-    $startDate = Carbon::parse($user_subscription->start_date);
-    $dueDate = $user_subscription->deposits
+    $startDate = Carbon::parse($userSubscription->start_date);
+    $dueDate = $userSubscription->deposits
             ->flatMap(function ($deposit) {
                 return $deposit->deposit_periods;
             })

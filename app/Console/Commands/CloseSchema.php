@@ -47,6 +47,7 @@ class CloseSchema extends Command
                 $endDate = Carbon::parse($userSubscription->end_date);
                 $duration = $userSubscription->scheme->total_period;
                 $flexibility_duration = $userSubscription->scheme->schemeType->flexibility_duration;
+                $endSixMonthPeriod = $startDate->copy()->addMonths($flexibility_duration);
 
                 // Check if there are unpaid deposit periods
                 $hasUnpaidPeriods = $userSubscription->deposits
@@ -62,12 +63,6 @@ class CloseSchema extends Command
                 // Check if the scheme's duration is over
                 if (
                     $startDate->diffInMonths($currentDate) >= $duration
-                    ||
-                    (
-                        $startDate->diffInMonths($currentDate) >= $flexibility_duration
-                        && $userSubscription->scheme->scheme_type_id !== SchemeType::FIXED_PLAN
-                        && $hasUnpaidPeriods
-                    )
                 ) {
 
                     $userSubscription->update(
@@ -82,7 +77,8 @@ class CloseSchema extends Command
                         ['subscription_id' => $userSubscription->id],
                         [
                             'description' => 'Scheme period of months completed',
-                            'is_closed' => true
+                            'is_closed' => true,
+                            'status' => $userSubscription->status
                         ]
                     );
 

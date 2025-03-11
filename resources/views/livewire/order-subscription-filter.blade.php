@@ -126,7 +126,7 @@
                                 </a>
                             </td>
                             <td>{{ date('d-m-Y', strtotime($deposit->paid_at)) }}</td>
-                            <td>{{ $deposit->subscription?->scheme?->title }}</td>
+                            <td>{{ $deposit->subscription?->scheme?->title_en }}</td>
 
                             <td>
                                 {{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit->total_scheme_amount, 2) }}

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Scheme;
+use App\Models\SchemeDetail;
 use Illuminate\Http\Request;
 
 class SchemeService
@@ -19,15 +20,20 @@ class SchemeService
     public function createScheme(array $userData): Scheme
     {
         $create = [
-            'title'    => $userData['title'],
-            'total_period'    => $userData['total_period'],
-            'scheme_type_id'    => $userData['scheme_type_id'],
-            'pdf_file' => $userData['pdf_file'],
-            'description'    => $userData['description'],
-            'status'    => $userData['status'],
-
+            'title_en' => $userData['title_en'],
+            'title_ml' => $userData['title_ml'],
+            'total_period' => $userData['total_period'],
+            'scheme_type_id' => $userData['scheme_type_id'],
+            'payment_terms_en' => $userData['payment_terms_en'],
+            'description_en' => $userData['description_en'],
+            'terms_and_conditions_en' => $userData['terms_and_conditions_en'],
+            'payment_terms_ml' => $userData['payment_terms_ml'],
+            'description_ml' => $userData['description_ml'],
+            'terms_and_conditions_ml' => $userData['terms_and_conditions_ml'],
+            'status' => $userData['status'],
         ];
         $scheme = Scheme::create($create);
+
         return $scheme;
     }
 
@@ -41,14 +47,19 @@ class SchemeService
     {
 
         $update = [
-            'title'    => $userData['title'],
+            'title_en'    => $userData['title_en'],
+            'title_ml' => $userData['title_ml'],
             'total_period'    => $userData['total_period'],
             'scheme_type_id'    => $userData['scheme_type_id'],
-            'pdf_file' => $userData['pdf_file'],
-            'description'    => $userData['description'],
+            'payment_terms_en' => $userData['payment_terms_en'],
+            'description_en' => $userData['description_en'],
+            'terms_and_conditions_en' => $userData['terms_and_conditions_en'],
+            'payment_terms_ml' => $userData['payment_terms_ml'],
+            'description_ml' => $userData['description_ml'],
+            'terms_and_conditions_ml' => $userData['terms_and_conditions_ml'],
             'status'    => $userData['status'],
-
         ];
+        
         $scheme->update($update);
     }
 

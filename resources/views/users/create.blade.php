@@ -101,15 +101,7 @@
                   @enderror
                 </div>
               </div>
-              <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-form-label">Email</label>
-                <div class="col-sm-9">
-                  <input type="email" id="title" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Enter Email" autocomplete="one-time-code">
-                  @error('email')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                  @enderror
-                </div>
-              </div>
+              
 
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">Mobile <span class="text-danger">*</span></label>
@@ -127,7 +119,7 @@
                   <select name="scheme_id" class="form-control select2 @error('scheme_id') is-invalid @enderror" id="scheme_id">
                     <option value="">Select Scheme</option>
                     @foreach($schemes as $scheme)
-                      <option data-scheme-type="{{ $scheme->scheme_type_id }}" <?= old('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{ $scheme->id }}" data-val="{{ $scheme->total_period }}">{{ $scheme->title }}</option>
+                      <option data-scheme-type="{{ $scheme->scheme_type_id }}" <?= old('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{ $scheme->id }}" data-val="{{ $scheme->total_period }}">{{ $scheme->title_en }}</option>
                     @endforeach
                   </select>
                   @error('scheme_id')
@@ -154,21 +146,7 @@
                   @enderror
                 </div>
               </div>
-              <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-form-label">Password <span class="text-danger">*</span></label>
-                <div class="col-sm-9">
-                  <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter Password" autocomplete="one-time-code">
-                  @error('password')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                  @enderror
-                </div>
-              </div>
-              <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-form-label">Confirm Password <span class="text-danger">*</span></label>
-                <div class="col-sm-9">
-                  <input type="password" id="password-confirm" name="password_confirmation" class="form-control" placeholder="Enter Confirm Password" autocomplete="new-password">
-                </div>
-              </div>
+              
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">Referrel Code <span class="text-danger">*</span></label>
                 <div class="col-sm-9">

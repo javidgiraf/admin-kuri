@@ -166,7 +166,7 @@
                                         <tr>
                                             <th scope="row">{{ $loop->iteration }}</th>
                                             <td>{{ $latestPayment->userSubscription->user->name }}</td>
-                                            <td>{{ $latestPayment->userSubscription->scheme->title }}</td>
+                                            <td>{{ $latestPayment->userSubscription->scheme->title_en }}</td>
                                             <td>{{ date('d/m/Y', strtotime($latestPayment->paid_at)) }}</td>
                                             <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($latestPayment->total_scheme_amount, 2) }}</td>
                                         </tr>

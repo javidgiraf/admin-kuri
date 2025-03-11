@@ -11,12 +11,18 @@ class Scheme extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
+        'title_en',
+        'title_ml',
         'total_period',
         'pdf_file',
-        'description',
         'status',
-        'scheme_type_id'
+        'scheme_type_id',
+        'payment_terms_en',
+        'terms_and_conditions_en',
+        'description_en',
+        'payment_terms_ml',
+        'terms_and_conditions_ml',
+        'description_ml',
     ];
 
     public function getFormattedTotalAmountAttribute()

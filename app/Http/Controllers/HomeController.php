@@ -43,8 +43,11 @@ class HomeController extends Controller
                 $query->whereIn('scheme_type_id', SchemeType::pluck('id'));
                 $query->distinct('scheme_type_id');
             })
-            ->latest()  // Get the latest payments first
-            ->take(5)  // Limit to the top 5
+            ->latest()
+            ->whereHas('userSubscription', function($query){
+                $query->groupBy('user_id');
+            })
+            ->take(5) 
             ->get();
 
         $schemes = [];
@@ -57,7 +60,7 @@ class HomeController extends Controller
                 ->sum('total_scheme_amount');
 
             $schemes[] = [
-                'name' => $scheme->title,
+                'name' => $scheme->title_en,
                 'value' => $schemeAmount,
             ];
         });
@@ -104,7 +107,7 @@ class HomeController extends Controller
             });
 
             $chartData[] = [
-                'name' => $scheme->title,
+                'name' => $scheme->title_en,
                 'data' => $monthlyData->toArray(),
             ];
         });

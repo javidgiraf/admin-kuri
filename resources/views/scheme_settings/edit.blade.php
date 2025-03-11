@@ -39,7 +39,7 @@
                                         <option value="" disabled>Select Scheme</option>
                                         @foreach($schemes as $scheme)
                                         <option value="{{ $scheme->id }}" {{ $scheme->id == $schemeSetting->scheme_id ? 'selected' : '' }}>
-                                            {{ $scheme->title }}
+                                            {{ $scheme->title_en }}
                                         </option>
                                         @endforeach
                                     </select>
