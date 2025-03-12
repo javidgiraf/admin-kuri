@@ -390,7 +390,7 @@ class UserService
             $user_subscription = UserSubscription::with([
                 'deposits.deposit_periods',
                 'scheme.schemeType',
-                'schemeSetting',
+                'scheme.schemeSetting',
             ])->findOrFail($userData['subscription_id']);
 
             $scheme = $user_subscription->scheme;
@@ -400,7 +400,7 @@ class UserService
             $currentDate = now();
             $flexibility_duration = $schemeType->flexibility_duration ?? 6; // First 6 months
             $endSixMonthPeriod = $startDate->copy()->addMonths($flexibility_duration);
-
+            $dueDuration = $user_subscription->scheme->schemeSetting->due_duration;
             // **Check the total scheme amount allowed in the first 6 months**
             $totalFlexibleSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($user_subscription) {
                 $query->where('subscription_id', $user_subscription->id);
@@ -466,7 +466,7 @@ class UserService
             }
 
             foreach (json_decode($userData['checkdata'], true) as $item) {
-                $dueDate = Carbon::parse($item['date']);
+                $dueDate = Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
                 $insertData[] = [
                     'deposit_id' => $deposit->id,
                     'due_date' => $dueDate->format('Y-m-d'),
