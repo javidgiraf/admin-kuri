@@ -467,6 +467,10 @@ class UserService
 
             foreach (json_decode($userData['checkdata'], true) as $item) {
                 $dueDate = Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
+
+                if ($currentDate->lessThanOrEqualTo($endSixMonthPeriod)) {
+                    $dueDate = Carbon::parse($item['date']);
+                }
                 $insertData[] = [
                     'deposit_id' => $deposit->id,
                     'due_date' => $dueDate->format('Y-m-d'),
