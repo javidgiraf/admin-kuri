@@ -574,7 +574,7 @@ class UserController extends Controller
                 ->where('scheme_id', $inputs['scheme'])
                 ->where('start_date', '>=', $subscriptionStart->format('Y-m-d')) // Start date should be before or on the given date
                 ->where('end_date', '<=', $subscriptionEnd->format('Y-m-d')) // End date should be after or on the given date
-                ->exists() && $totalSchemeAmount != 0
+                ->exists() && $userSubscription->scheme_id == $inputs['scheme']
             ) {
                 return response()->json([
                     'success' => false,
@@ -589,20 +589,6 @@ class UserController extends Controller
                     'success' => false,
                     'message' => 'Already joined new scheme'
                 ], 400);
-            }
-
-            $closedSubscription = UserSubscription::where('user_id', $userSubscription->user_id)
-                ->where('scheme_id', $userSubscription->scheme_id)
-                ->where('is_closed', true)
-                ->findOrFail($userSubscription->id);
-
-            $totalSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($closedSubscription) {
-                $query->where('subscription_id', $closedSubscription->id);
-            })
-            ->sum('scheme_amount');
-
-            if($totalSchemeAmount == 0) {
-                $closedSubscription->delete();
             }
 
             UserSubscription::create([

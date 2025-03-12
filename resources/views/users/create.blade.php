@@ -131,7 +131,7 @@
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">Start Date <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="date" class="form-control @error('start_date') is-invalid @enderror" name="start_date" id="start_date" value="{{ old('start_date') }}">
+                  <input type="date" class="form-control @error('start_date') is-invalid @enderror" name="start_date" id="start_date" value="{{ date('Y-m-d') }}">
                   @error('start_date')
                     <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
