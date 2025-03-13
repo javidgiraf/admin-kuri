@@ -201,8 +201,8 @@ class UserService
             ->where('user_id', $user_id)
             ->where('scheme_id', $scheme_id)
             ->where('is_closed', false)
-            ->first();
-            
+            ->findOrFail($user_subscription_id);
+
         $user_subscription_deposits = Deposit::where('subscription_id', $user_subscription_id)->get();
 
         $start_date_str = $user_subscription->start_date
@@ -215,10 +215,26 @@ class UserService
 
         $result_dates = $this->generateDates($start_date_str, $end_date_str);
 
-        $startDate = Carbon::parse($user_subscription->start_date)->format('Y-m-d');
+        $starting_date = Carbon::parse($user_subscription->start_date);
+        $ending_date = Carbon::parse($user_subscription->end_date);
         $currentDate = now();
         $flexibility_duration = $user_subscription->scheme->schemeType->flexibility_duration ?? 0;
-        $endSixMonthPeriod = Carbon::parse($user_subscription->start_date)->addMonths($flexibility_duration)->format('Y-m-d');
+        $endSixMonthPeriod = Carbon::parse($starting_date)->addMonths($flexibility_duration);
+
+        if ($user_subscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN) {
+            $result_dates = $this->generateDates($start_date_str, $end_date_str);
+        }
+
+        if (
+            $currentDate->greaterThanOrEqualTo($endSixMonthPeriod)
+            && $user_subscription->scheme->scheme_type_id !== SchemeType::FIXED_PLAN
+        ) {
+            $result_dates = $this->generateDates(
+                $endSixMonthPeriod->format('Y-m-d'),
+                $ending_date->format('Y-m-d')
+            );
+        }
+
         $totalFlexibleSchemeAmount = Deposit::where('subscription_id', $user_subscription_id)
             ->with('deposit_periods')
             ->get()
@@ -466,16 +482,23 @@ class UserService
             }
 
             foreach (json_decode($userData['checkdata'], true) as $item) {
-                $dueDate = Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
+                $dueDate = Carbon::parse($item['date']);
 
-                if ($currentDate->lessThanOrEqualTo($endSixMonthPeriod)) {
-                    $dueDate = Carbon::parse($item['date']);
+                if ($schemeType->id == SchemeType::FIXED_PLAN) {
+                    $dueDate = Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
                 }
+
+                if ($currentDate->greaterThanOrEqualTo($endSixMonthPeriod) && $schemeType->id !== SchemeType::FIXED_PLAN) {
+                    $dueDate = (Carbon::parse($item['date'])->format('d') > 15) ?
+                    Carbon::parse($item['date'])->addMonths(1)->startOfMonth()->addDays($dueDuration)
+                        : Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
+                }
+
                 $insertData[] = [
                     'deposit_id' => $deposit->id,
                     'due_date' => $dueDate->format('Y-m-d'),
                     'scheme_amount' => $item['amount'] ?? 0,
-                    'is_due' => now()->greaterThan($dueDate) ? '1' : '0',
+                    'is_due' => now()->greaterThanOrEqualTo($dueDate) ? '1' : '0',
                     'status' => '1',
                     'created_at' => now(),
                     'updated_at' => now(),
