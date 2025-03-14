@@ -135,12 +135,19 @@ class UserController extends Controller
      */
     public function destroy(string $id, UserService $userService)
     {
-        //
         $id = decrypt($id);
         $user = $userService->getUser($id);
-        $userService->deleteUser($user);
-        LogActivity::addToLog('User ' . $user->name . ' removed by' . auth()->user()->name);
-        return redirect()->route('users.index')->with('success', 'User deleted successfully');
+
+        try {
+            if (UserSubscription::where('user_id', $user->id)->exists()) {
+                return redirect()->route('users.index')->with('error', 'A subscription already exists for this user and cannot be deleted.');
+            }
+            $userService->deleteUser($user);
+            LogActivity::addToLog('User ' . $user->name . ' removed by ' . auth()->user()->name);
+            return redirect()->route('users.index')->with('success', 'User deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('users.index')->with('error', $e->getMessage());
+        }
     }
     public function getUserSubscriptions(UserService $userService)
     {
@@ -454,6 +461,14 @@ class UserController extends Controller
         ), 'user-subscriptions-report.xlsx');
     }
 
+    public function subscriptionsDestroy($id) 
+    {
+        $id = decrypt($id);
+        UserSubscription::findOrFail($id)->delete();
+
+        return redirect()->route('users.get-user-subscriptions')->with('success', 'Subscription deleted successfully');
+    }
+
     public function changeSubscriptionStatus(Request $request)
     {
         $inputs = $request->all();
@@ -568,9 +583,10 @@ class UserController extends Controller
             $totalSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
                 $query->where('subscription_id', $userSubscription->id);
             })
-            ->sum('scheme_amount');
+                ->sum('scheme_amount');
 
-            if (UserSubscription::where('user_id', $userSubscription['user_id'])
+            if (
+                UserSubscription::where('user_id', $userSubscription['user_id'])
                 ->where('scheme_id', $inputs['scheme'])
                 ->where('start_date', '>=', $subscriptionStart->format('Y-m-d')) // Start date should be before or on the given date
                 ->where('end_date', '<=', $subscriptionEnd->format('Y-m-d')) // End date should be after or on the given date

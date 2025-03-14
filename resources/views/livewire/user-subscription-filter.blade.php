@@ -234,6 +234,16 @@
                                 </a>
                             </td>
 
+                            <td class="fixed-left">
+                                <a href="#" onclick="event.preventDefault(); deleteSubscription('{{ $userSubscription->id }}');" style="margin-right: 10px;">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                                <!-- <form method="post" action="{{route('subscriptions.destroy', encrypt($userSubscription->id))}}" style="display:none" id="delete-form-{{$userSubscription->id}}">
+                                    @csrf
+                                    
+                                </form> -->
+                            </td>
 
 
                         </tr>
@@ -710,5 +720,21 @@
             }
         });
     });
+
+    function deleteSubscription(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete your Subscription ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
 </script>
 @endpush

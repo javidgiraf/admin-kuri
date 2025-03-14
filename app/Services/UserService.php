@@ -163,14 +163,10 @@ class UserService
 
     public function deleteUser(User $user): void
     {
-        if (UserSubscription::where('user_id', $user->id)->exists()) {
-            throw new \Exception('User already exist in user subscription');
-        } else {
-            Customer::where('user_id', $user->id)->delete();
-            Address::where('user_id', $user->id)->delete();
-            Nominee::where('user_id', $user->id)->delete();
-            User::find($user->id)->delete();
-        }
+        Customer::where('user_id', $user->id)->delete();
+        Address::where('user_id', $user->id)->delete();
+        Nominee::where('user_id', $user->id)->delete();
+        User::find($user->id)->delete();
     }
 
     function generateDates($start_date_str, $end_date_str)
@@ -200,7 +196,6 @@ class UserService
         $user_subscription = UserSubscription::with('scheme.schemeType')
             ->where('user_id', $user_id)
             ->where('scheme_id', $scheme_id)
-            ->where('is_closed', false)
             ->findOrFail($user_subscription_id);
 
         $user_subscription_deposits = Deposit::where('subscription_id', $user_subscription_id)->get();
@@ -490,7 +485,7 @@ class UserService
 
                 if ($currentDate->greaterThanOrEqualTo($endSixMonthPeriod) && $schemeType->id !== SchemeType::FIXED_PLAN) {
                     $dueDate = (Carbon::parse($item['date'])->format('d') > 15) ?
-                    Carbon::parse($item['date'])->addMonths(1)->startOfMonth()->addDays($dueDuration)
+                        Carbon::parse($item['date'])->addMonths(1)->startOfMonth()->addDays($dueDuration)
                         : Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
                 }
 

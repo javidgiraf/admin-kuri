@@ -191,9 +191,9 @@ use App\Services\UserService;
                                 </tr>
                                 @endforeach
                                 @else
-                                    <tr>
-                                        <td colspan="8">No records available in table</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="8">No records available in table</td>
+                                </tr>
                                 @endif
 
                             </tbody>
@@ -224,6 +224,15 @@ use App\Services\UserService;
 @endsection
 @push('scripts')
 <script>
+    <?php if ($message = session('error')): ?>
+        swal({
+            title: "Warning",
+            text: "{{ $message }}",
+            icon: "warning",
+            buttons: true,
+        });
+    <?php endif; ?>
+
     function deleteUser(id) {
 
         swal({
@@ -239,6 +248,7 @@ use App\Services\UserService;
                 }
             });
     }
+
 
     $.ajaxSetup({
         headers: {
