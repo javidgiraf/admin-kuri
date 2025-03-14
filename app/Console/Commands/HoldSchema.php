@@ -65,6 +65,16 @@ class HoldSchema extends Command
 
                     $holdDateFixed = $holdDate->copy()->addDays($duration);
                     $holdDateFlexible = $holdDate->copy()->addMonths($flexibility_duration)->addDays($duration);
+                    
+                    $totalFixedSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
+                        $query->where('subscription_id', $userSubscription->id);
+                        $query->where('status', true);
+                    })
+                        ->where('due_date', '>=', $startDate->format('Y-m-d'))
+                        ->where('due_date', '<', $holdDateFixed->format('Y-m-d'))
+                        ->where('status', true)
+                        ->sum('scheme_amount');
+                    
                     $totalFlexibleSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
                         $query->where('subscription_id', $userSubscription->id);
                         $query->where('status', true);
@@ -76,9 +86,9 @@ class HoldSchema extends Command
 
                     if (
                         (
-                            $currentDate->diffInDays($holdDateFixed) >= $duration &&
+                            $currentDate->diffInDays($holdDate) >= $duration &&
                             $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN &&
-                            $totalFlexibleSchemeAmount == 0
+                            $totalFixedSchemeAmount == 0
                         ) ||
                         (
                             $currentDate->greaterThanOrEqualTo($holdDateFlexible) &&
