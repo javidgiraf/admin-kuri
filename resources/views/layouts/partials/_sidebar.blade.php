@@ -82,7 +82,7 @@
     <li class="nav-item">
       <a class="nav-link {{ Route::is('deposits.*') ? '' : 'collapsed' }}" href="{{route('deposits.index')}}">
         <i class="bi bi-cart-check"></i>
-        <span>{{ __('Deposits') }}</span>
+        <span>{{ __('Transactions') }}</span>
       </a>
     </li>
     @endcan

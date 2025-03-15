@@ -588,8 +588,14 @@ class UserController extends Controller
             if (
                 UserSubscription::where('user_id', $userSubscription['user_id'])
                 ->where('scheme_id', $inputs['scheme'])
-                ->where('start_date', '>=', $subscriptionStart->format('Y-m-d')) // Start date should be before or on the given date
-                ->where('end_date', '<=', $subscriptionEnd->format('Y-m-d')) // End date should be after or on the given date
+                ->where(function ($query) use ($subscriptionStart, $subscriptionEnd) {
+                    $query->whereBetween('start_date', [$subscriptionStart->format('Y-m-d'), $subscriptionEnd->format('Y-m-d')])
+                          ->orWhereBetween('end_date', [$subscriptionStart->format('Y-m-d'), $subscriptionEnd->format('Y-m-d')])
+                          ->orWhere(function ($q) use ($subscriptionStart, $subscriptionEnd) {
+                              $q->where('start_date', '<=', $subscriptionStart->format('Y-m-d'))
+                                ->where('end_date', '>=', $subscriptionEnd->format('Y-m-d'));
+                          });
+                }) 
                 ->exists() && $userSubscription->scheme_id == $inputs['scheme']
             ) {
                 return response()->json([
