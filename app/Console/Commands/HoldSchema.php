@@ -86,7 +86,7 @@ class HoldSchema extends Command
 
                     if (
                         (
-                            $currentDate->diffInDays($holdDate) >= $duration &&
+                            $currentDate->diffInDays($holdDate) > $duration &&
                             $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN &&
                             $totalFixedSchemeAmount == 0
                         ) ||

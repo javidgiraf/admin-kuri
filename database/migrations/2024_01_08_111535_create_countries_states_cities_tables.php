@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('states', function (Blueprint $table) {
@@ -31,6 +32,7 @@ return new class extends Migration
                   ->on('countries')
                   ->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('districts', function (Blueprint $table) {
@@ -44,6 +46,7 @@ return new class extends Migration
                   ->on('states')
                   ->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

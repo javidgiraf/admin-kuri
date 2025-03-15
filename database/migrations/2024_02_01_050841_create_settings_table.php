@@ -14,9 +14,14 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('option_name')->nullable();
+            $table->string('option_code')->nullable();
             $table->string('option_value')->nullable();
+            $table->longText('terms_and_conditions_en')->nullable();
+            $table->longText('terms_and_conditions_ml')->nullable();
+            $table->string('symbol', 10)->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

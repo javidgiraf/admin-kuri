@@ -13,18 +13,18 @@ return new class extends Migration
     {
         Schema::create('discontinues', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('subscription_id')->default(0);
+            $table->unsignedBigInteger('subscription_id');
             $table->double('final_amount', 16, 2)->default(0.00)->nullable();
             $table->double('settlement_amount', 16, 2)->default(0.00)->nullable();
             $table->date('paid_on')->nullable();
             $table->longText('reason')->nullable();
             $table->tinyInteger('status')->default('1');
-            $table->timestamps();
-            $table->softDeletes();
             $table->foreign('subscription_id')
                 ->references('id')
                 ->on('user_subscriptions')
                 ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

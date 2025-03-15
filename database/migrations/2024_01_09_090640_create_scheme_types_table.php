@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
-            $table->string('option_code')->unique()->nullable()->after('option_name');
+        Schema::create('scheme_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('shortcode')->unique();
+            $table->integer('flexibility_duration')->nullable();
+            $table->tinyInteger('status')->default('1');
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -23,8 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('scheme_types');
     }
 };

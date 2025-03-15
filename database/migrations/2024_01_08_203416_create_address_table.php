@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->default(0);
             $table->longText('address')->nullable();
-            $table->unsignedBigInteger('district_id')->default(0);
-            $table->unsignedBigInteger('state_id')->default(0);
-            $table->unsignedBigInteger('country_id')->default(0);
-            $table->integer('pincode')->default(0);
+            $table->unsignedBigInteger('district_id')->nullable();
+            $table->unsignedBigInteger('state_id')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->integer('pincode')->nullable();
             $table->tinyInteger('status')->default(1);
-            $table->timestamps();
             $table->foreign('user_id')
                   ->references('id')
                   ->on('users')
@@ -38,6 +37,9 @@ return new class extends Migration
                   ->references('id')
                   ->on('countries')
                   ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
+            
         });
     }
 

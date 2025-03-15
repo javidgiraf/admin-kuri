@@ -18,6 +18,7 @@ return new class extends Migration
             $table->datetime('date_on');
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -13,21 +13,24 @@ return new class extends Migration
     {
         Schema::create('deposits', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('subscription_id')->default(0);
-            $table->unsignedBigInteger('order_id')->default(0)->unique()->nullable();
+            $table->unsignedBigInteger('subscription_id');
+            $table->unsignedBigInteger('order_id')->unique()->nullable();
+            $table->string('user_type')->nullable();
             $table->string('payment_type')->nullable();
             $table->double('total_scheme_amount', 16, 2)->default(0.00)->nullable();
             $table->double('service_charge', 16, 2)->default(0.00)->nullable();
             $table->double('gst_charge', 16, 2)->default(0.00)->nullable();
             $table->double('final_amount', 16, 2)->default(0.00)->nullable();
-            $table->date('paid_at');
+            $table->dateTime('date_of_payment')->nullable();
+            $table->date('paid_at')->nullable();
             $table->longText('remarks')->nullable();
             $table->tinyInteger('status')->default(0);
-            $table->timestamps();
             $table->foreign('subscription_id')
                 ->references('id')
                 ->on('user_subscriptions')
                 ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

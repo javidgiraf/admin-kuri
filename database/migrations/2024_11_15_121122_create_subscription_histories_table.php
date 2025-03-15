@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('subscription_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('subscription_id');
-            $table->tinyInteger('status')->default(0);
             $table->text('description')->nullable();
+            $table->tinyInteger('status')->default(0);
             $table->tinyInteger('is_closed')->default(false);
             $table->foreign('subscription_id')
                   ->references('id')
                   ->on('user_subscriptions')
                   ->onDelete('CASCADE');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

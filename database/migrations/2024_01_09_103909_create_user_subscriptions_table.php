@@ -13,21 +13,26 @@ return new class extends Migration
     {
         Schema::create('user_subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->default(0);
-            $table->unsignedBigInteger('scheme_id')->default(0);
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('scheme_id');
+            $table->float('subscribe_amount')->default(0);
             $table->date('start_date');
             $table->date('end_date');
+            $table->text('reason')->nullable();
+            $table->dateTime('claim_date')->nullable();
+            $table->boolean('claim_status')->default(false);
             $table->tinyInteger('is_closed')->default(0);
             $table->tinyInteger('status')->default(1);
-            $table->timestamps();
             $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->foreign('scheme_id')
-                  ->references('id')
-                  ->on('schemes')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('schemes')
+                ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

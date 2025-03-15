@@ -13,13 +13,21 @@ return new class extends Migration
     {
         Schema::create('schemes', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
-            $table->double('total_amount', 16, 2)->default(0.00)->nullable();
+            $table->unsignedBigInteger('scheme_type_id');
+            $table->string('title_en')->nullable();
+            $table->string('title_ml')->nullable();
             $table->integer('total_period')->default(0)->nullable();
-            $table->double('schedule_amount', 16, 2)->default(0.00)->nullable();
-            $table->longtext('description')->nullable();
+            $table->longtext('payment_terms_en')->nullable();
+            $table->longtext('payment_terms_ml')->nullable();
+            $table->longtext('description_en')->nullable();
+            $table->longtext('description_ml')->nullable();
+            $table->longtext('terms_and_conditions_en')->nullable();
+            $table->longtext('terms_and_conditions_ml')->nullable();
+            $table->string('pdf_file')->nullable();
             $table->tinyInteger('status')->default(1)->nullable();
+            $table->foreign('scheme_type_id')->references('id')->on('scheme_types')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

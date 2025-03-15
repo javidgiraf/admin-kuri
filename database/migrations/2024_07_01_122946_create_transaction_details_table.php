@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('transaction_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('deposit_id')->default(0);
-            $table->string('transaction_no')->default(0)->unique()->nullable();
+            $table->unsignedBigInteger('deposit_id');
+            $table->string('transaction_no')->unique()->nullable();
             $table->string('receipt_upload')->nullable();
             $table->longText('remark')->nullable();
             $table->tinyInteger('status')->default('1');
-            $table->timestamps();
-            $table->softDeletes();
             $table->foreign('deposit_id')
                 ->references('id')
                 ->on('deposits')
                 ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

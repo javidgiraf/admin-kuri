@@ -13,13 +13,17 @@ return new class extends Migration
   {
     Schema::create('scheme_settings', function (Blueprint $table) {
       $table->id();
-      $table->integer('scheme_id');
+      $table->unsignedBigInteger('scheme_id');
       $table->float('max_payable_amount')->nullable();
       $table->float('min_payable_amount')->nullable();
       $table->float('denomination')->nullable();
       $table->integer('due_duration')->nullable();
+      $table->integer('start_from')->nullable();
+      $table->integer('end_to')->nullable();
       $table->tinyInteger('status');
+      $table->foreign('scheme_id')->references('id')->on('schemes')->onDelete('cascade');
       $table->timestamps();
+      $table->softDeletes();
     });
   }
 

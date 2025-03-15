@@ -20,6 +20,7 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0);
             $table->foreign('deposit_id')->references('id')->on('deposits')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

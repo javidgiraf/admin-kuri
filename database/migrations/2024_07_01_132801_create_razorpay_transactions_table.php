@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('razorpay_transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('deposit_id')->default(0)->unique()->nullable();
+            $table->unsignedBigInteger('deposit_id')->nullable();
             $table->string('razorpay_payment_id')->unique()->nullable();
             $table->string('razorpay_order_id')->unique()->nullable();
             $table->string('razorpay_signature')->unique()->nullable();
             $table->tinyInteger('status')->default('1');
-            $table->timestamps();
             $table->foreign('deposit_id')
                 ->references('id')
                 ->on('deposits')
                 ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

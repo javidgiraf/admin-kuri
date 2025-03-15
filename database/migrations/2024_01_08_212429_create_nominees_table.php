@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('nominees', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->default(0);
+            $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->string('relationship');
             $table->string('phone');
             $table->tinyInteger('status')->default(1);
-            $table->timestamps();
             $table->foreign('user_id')
                   ->references('id')
                   ->on('users')
                   ->onDelete('cascade');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
