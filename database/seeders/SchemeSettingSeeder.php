@@ -15,6 +15,8 @@ class SchemeSettingSeeder extends Seeder
      */
     public function run(): void
     {
+        SchemeSetting::truncate();
+        
         $schemeSettings = [
             [
                 'scheme_id' => SchemeType::FIXED_PLAN,

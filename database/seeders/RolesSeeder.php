@@ -27,6 +27,8 @@ class RolesSeeder extends Seeder
 
     public function run()
     {
+        Role::truncate();
+        
         $roles = ['superadmin', 'admin', 'customer'];
 
         foreach ($roles as $role) {
