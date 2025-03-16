@@ -106,7 +106,7 @@
 
 
 
-    @can(['goldrates.index', 'countries.index', 'settings.index', 'scheme-settings.index'])
+    @can(['goldrates.index', 'countries.index', 'states.index', 'districts.index', 'scheme-settings.index'])
     <li class="nav-item">
       <a class="nav-link {{ Route::is('goldrates.*') || Route::is('logactivities.*') || Route::is('countries.*') || Route::is('states.*') || Route::is('districts.*') || Route::is('settings.*') || Route::is('scheme-settings.*')  ? '' : 'collapsed' }}" data-bs-target="#gold-rate-nav" data-bs-toggle="collapse" href="#">
         <i class="ri ri-settings-3-line"></i><span>{{ __('General Settings') }}</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -143,11 +143,11 @@
           </a>
         </li>
 
-        <li>
+        <!-- <li>
           <a class="{{ Route::is('settings.*')? 'js' : ''}}" href="{{route('settings.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Settings') }}</span>
           </a>
-        </li>
+        </li> -->
         <li>
           <a class="{{ Route::is('scheme-settings.*')? 'js' : ''}}" href="{{route('scheme-settings.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Scheme Settings') }}</span>
