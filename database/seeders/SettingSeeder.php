@@ -77,6 +77,8 @@ class SettingSeeder extends Seeder
                 <p class="MsoNormal"><span style="font-family: 'Nirmala UI','sans-serif';">ഈകരാറുമായിബന്ധപ്പെട്ട്നിങ്ങൾക്ക്എന്തെങ്കിലുംചോദ്യങ്ങളോആശങ്കകളോപരാതികളോഉണ്ടെങ്കിൽ, ചുവടെയുള്ളവിശദാംശങ്ങൾഉപയോഗിച്ച്ഞങ്ങളെബന്ധപ്പെടാവുന്നതാണ്.madhurimagold@gmail.com</span></p>
                 <p class="MsoNormal"><span style="font-family: 'Nirmala UI','sans-serif';">ഈഡോക്യുമെൻ്റ്അവസാനംഅപ്ഡേറ്റ്ചെയ്തത് 2024 ഡിസംബർ 12 നാണ്</span></p>
             `,
+            'support_contact' => '7909162917',
+            'working_time' => '10 AM to 5.30 PM, Sunday Holiday',
             'status' => true,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
