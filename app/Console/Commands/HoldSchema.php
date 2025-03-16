@@ -85,8 +85,9 @@ class HoldSchema extends Command
                         ->sum('scheme_amount');
 
                     if (
-                        (
-                            $currentDate->diffInDays($holdDate) > $duration &&
+                        ( 
+                            $currentDate->format('Y-m') == $holdDate->format('Y-m') &&
+                            $currentDate->diffInDays($holdDate) >= $duration &&
                             $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN &&
                             $totalFixedSchemeAmount == 0
                         ) ||
