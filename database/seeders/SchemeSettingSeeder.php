@@ -7,6 +7,7 @@ use App\Models\SchemeType;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class SchemeSettingSeeder extends Seeder
 {
@@ -15,7 +16,9 @@ class SchemeSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        SchemeSetting::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('scheme_settings')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         
         $schemeSettings = [
             [

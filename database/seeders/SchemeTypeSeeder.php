@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\SchemeType;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class SchemeTypeSeeder extends Seeder
 {
@@ -14,8 +15,9 @@ class SchemeTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        // Truncate the table to clear any existing data
-        SchemeType::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('scheme_types')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // Define the schemes to be added
         $schemes = [
@@ -45,7 +47,6 @@ class SchemeTypeSeeder extends Seeder
             ]
         ];
 
-        // Insert all the scheme records in one go
         SchemeType::insert($schemes);
     }
 }

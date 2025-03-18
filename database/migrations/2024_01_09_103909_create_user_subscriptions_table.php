@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('reason')->nullable();
             $table->dateTime('claim_date')->nullable();
             $table->boolean('claim_status')->default(false);
+            $table->integer('same_scheme')->nullable();
             $table->tinyInteger('is_closed')->default(0);
             $table->tinyInteger('status')->default(1);
             $table->foreign('user_id')

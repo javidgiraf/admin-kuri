@@ -14,6 +14,8 @@ class GoldRateSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('gold_rates')->truncate();
+        
         DB::table('gold_rates')->insert([
             'per_gram'        => '6090.00',
             'per_pavan'        => '48720.00',

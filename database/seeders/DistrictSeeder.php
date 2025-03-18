@@ -12,8 +12,13 @@ class DistrictSeeder extends Seeder
     /**
      * Run the database seeds.
      */
+
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('districts')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+       
         $json = \Illuminate\Support\Facades\File::get("database/data/districts.json");
         $districts = json_decode($json);
         collect($districts)->map(function($district){

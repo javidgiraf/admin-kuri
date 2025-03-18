@@ -16,7 +16,9 @@ class SchemeSeeder extends Seeder
      */
     public function run(): void
     {
-        Scheme::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('schemes')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $schemes = [
             [
