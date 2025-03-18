@@ -95,7 +95,7 @@
 
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped" style="width: 130%;">  
+                        <table class="table table-striped" style="width: 130%;">
                             {{-- <div style='text-align: end' ;><a href="{{route('districts.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i><span>Add District</span></a>
                     </div> --}}
 
@@ -120,7 +120,7 @@
                             <th scope="row">{{ $deposits->firstitem() + $loop->index }}</th>
                             <td>{{ $deposit->subscription?->user?->name }}</td>
                             <td>
-                                
+
                                 <a data-bs-toggle="modal" class="model" data-bs-target="#ExtralargeModal" style="color:blue; cursor: pointer; text-decoration: underline;" order_id="{{ encrypt($deposit->order_id) }}" status="{{ $deposit->status }}">
                                     {{ $deposit->order_id }}
                                 </a>
@@ -146,21 +146,22 @@
                             <td class="fixed-left">
 
                                 {{-- <a href="{{route('users.edit-scheme-details',[encrypt($userSubscription->id),encrypt($userSubscription->user?->id),encrypt($userSubscription->scheme?->id)])}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a> --}}
-                                {{-- <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $district->id }}').submit();"><i class="bi bi-x-circle"></i></a> --}}
+                                @can('deposits.destroy')
+                                <a href="javascript:void(0);" onclick="event.preventDefault(); deleteDeposit('{{ $deposit->id }}');"><i class="bi bi-x-circle"></i></a>
+                                @endcan
                             </td>
 
-                            {{-- <form method="post" action="{{route('districts.destroy', encrypt($district->id))}}" style="display:none" id="delete-form-{{$district->id}}">
-                            @csrf
-                            @method('DELETE')
-                            </form> --}}
+                            <form method="post" action="{{route('deposits.destroy', encrypt($deposit->id))}}" style="display:none" id="delete-form-{{$deposit->id}}">
+                                @csrf
+                                @method('DELETE')
+                            </form>
 
                         </tr>
                         @endforeach
                         @else
-                            <tr>
-                                <td colspan="10">No Records available in table</td>
-                            </tr>
+                        <tr>
+                            <td colspan="10">No Records available in table</td>
+                        </tr>
                         @endif
                         <div class="modal fade" id="ExtralargeModal" tabindex="-1">
                             <div class="modal-dialog modal-xl fetch-deposit-list">
@@ -278,7 +279,7 @@
 
         $(".is-invalid").removeClass('is-invalid');
         $(".invalid-feedback").removeClass('invalid-feedback').text('');
-        
+
         const formData = new FormData($("#frm_transation_details")[0]);
         if ($("#transaction_no").val() == "") {
             $("#transaction_no").addClass('is-invalid');
@@ -318,11 +319,11 @@
             },
             error: function(data) {
                 if (data.responseJSON.errors.transaction_no) {
-                   $("#transaction_no").addClass('is-invalid');
-                   $(".transactionNoError").addClass('invalid-feedback').text(data.responseJSON.errors.transaction_no[0]);
+                    $("#transaction_no").addClass('is-invalid');
+                    $(".transactionNoError").addClass('invalid-feedback').text(data.responseJSON.errors.transaction_no[0]);
                 }
 
-                if(data.responseJSON.errors.receipt_upload) {
+                if (data.responseJSON.errors.receipt_upload) {
                     $("#receipt_upload").addClass('is-invalid');
                     $(".receiptUploadError").addClass('invalid-feedback').text(data.responseJSON.errors.receipt_upload[0]);
                 }
@@ -392,5 +393,21 @@
             }
         });
     });
+
+    function deleteDeposit(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this deposit ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
 </script>
 @endpush

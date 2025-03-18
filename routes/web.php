@@ -112,6 +112,7 @@ Route::group(['middleware' => ['auth', 'permission']], function () {
     Route::get('fetch-failed-deposit-by-order', [UserController::class, 'fetchFailedDepositByorder'])->name('users.fetch-failed-deposit-by-order');
     Route::post('save-failed-process-status', [UserController::class, 'saveFailedProcessStatus'])->name('users.save-failed-process-status');
     Route::get('deposits', [OrderController::class, 'index'])->name('deposits.index');
+    Route::delete('deposits/destroy/{id}', [OrderController::class, 'destory'])->name('deposits.destroy');
     Route::post('change-status', [UserController::class, 'changeStatus'])->name('users.change-status');
     Route::post('change-subscription-status', [UserController::class, 'changeSubscriptionStatus'])->name('change-subscription-status');
     Route::post('change-maturity-status', [UserController::class, 'changeMaturityStatus'])->name('change-maturity-status');

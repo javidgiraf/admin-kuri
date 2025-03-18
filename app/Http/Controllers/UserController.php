@@ -461,12 +461,21 @@ class UserController extends Controller
         ), 'user-subscriptions-report.xlsx');
     }
 
-    public function subscriptionsDestroy($id) 
+    public function subscriptionsDestroy($id)
     {
-        $id = decrypt($id);
-        UserSubscription::findOrFail($id)->delete();
 
-        return redirect()->route('users.get-user-subscriptions')->with('success', 'Subscription deleted successfully');
+        try {
+            if (Deposit::where('subscription_id', $id)->exists()) {
+                return redirect()->route('users.get-user-subscriptions')->with('error', 'Deposit already exists for this subscription and cannot be deleted.');
+            }
+
+            $id = decrypt($id);
+            UserSubscription::findOrFail($id)->delete();
+
+            return redirect()->route('users.get-user-subscriptions')->with('success', 'Subscription deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('users.get-user-subscriptions')->with('error', $e->getMessage());
+        }
     }
 
     public function changeSubscriptionStatus(Request $request)
@@ -590,12 +599,12 @@ class UserController extends Controller
                 ->where('scheme_id', $inputs['scheme'])
                 ->where(function ($query) use ($subscriptionStart, $subscriptionEnd) {
                     $query->whereBetween('start_date', [$subscriptionStart->format('Y-m-d'), $subscriptionEnd->format('Y-m-d')])
-                          ->orWhereBetween('end_date', [$subscriptionStart->format('Y-m-d'), $subscriptionEnd->format('Y-m-d')])
-                          ->orWhere(function ($q) use ($subscriptionStart, $subscriptionEnd) {
-                              $q->where('start_date', '<=', $subscriptionStart->format('Y-m-d'))
+                        ->orWhereBetween('end_date', [$subscriptionStart->format('Y-m-d'), $subscriptionEnd->format('Y-m-d')])
+                        ->orWhere(function ($q) use ($subscriptionStart, $subscriptionEnd) {
+                            $q->where('start_date', '<=', $subscriptionStart->format('Y-m-d'))
                                 ->where('end_date', '>=', $subscriptionEnd->format('Y-m-d'));
-                          });
-                }) 
+                        });
+                })
                 ->exists() && $userSubscription->scheme_id == $inputs['scheme']
             ) {
                 return response()->json([

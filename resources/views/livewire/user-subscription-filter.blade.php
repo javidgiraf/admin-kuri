@@ -428,6 +428,15 @@
 
 @push('scripts')
 <script>
+    <?php if ($message = session('error')): ?>
+        swal({
+            title: "Warning",
+            text: "{{ $message }}",
+            icon: "warning",
+            buttons: true,
+        });
+    <?php endif; ?>
+
     let baseUrl = "{{ route('users.get-user-subscriptions') }}";
     let exportUrl = "{{ route('subscriptionsExport') }}";
 
