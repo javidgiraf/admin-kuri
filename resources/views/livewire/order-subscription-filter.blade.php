@@ -47,7 +47,7 @@
                                 <select wire:model="scheme_id" class="form-control" id="scheme_id">
                                     <option value="">Select scheme</option>
                                     @foreach($schemes as $scheme)
-                                    <option value="{{$scheme->id}}">{{$scheme->title}}</option>
+                                    <option value="{{$scheme->id}}">{{$scheme->title_en}}</option>
                                     @endforeach
                                 </select>
                             </div>
