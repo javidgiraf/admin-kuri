@@ -465,11 +465,12 @@ class UserController extends Controller
     {
 
         try {
+            $id = decrypt($id);
+            
             if (Deposit::where('subscription_id', $id)->exists()) {
                 return redirect()->route('users.get-user-subscriptions')->with('error', 'Deposit already exists for this subscription and cannot be deleted.');
             }
 
-            $id = decrypt($id);
             UserSubscription::findOrFail($id)->delete();
 
             return redirect()->route('users.get-user-subscriptions')->with('success', 'Subscription deleted successfully');

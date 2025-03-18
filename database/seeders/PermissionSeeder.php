@@ -140,6 +140,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'orders.index', 'guard_name' => 'web'],
             ['name' => 'users.change-status', 'guard_name' => 'web'],
             ['name' => 'deposits.index', 'guard_name' => 'web'],
+            ['name' => 'deposits.destroy', 'guard_name' => 'web'],
             ['name' => 'users.get-user-subscriptions-list', 'guard_name' => 'web'],
             ['name' => 'accounts.index', 'guard_name' => 'web'],
             ['name' => 'transaction-details.index', 'guard_name' => 'web'],
