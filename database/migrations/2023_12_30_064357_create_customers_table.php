@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->default(0);
             $table->string('mobile')->unique()->nullable()->default(0);
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('referrel_code')->unique()->nullable();
             $table->string('aadhar_number')->unique()->nullable();
             $table->string('pancard_no', 200)->nullable(true);

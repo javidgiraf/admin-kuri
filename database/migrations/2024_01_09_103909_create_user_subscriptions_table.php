@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('scheme_id');
-            $table->float('subscribe_amount')->default(0);
+            $table->float('subscribe_amount')->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->text('reason')->nullable();
