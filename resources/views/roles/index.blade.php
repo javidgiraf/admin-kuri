@@ -21,7 +21,11 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between mt-0 m-3">
                         <h5><b>Manage Roles</b></h5>
+                        @role('superadmin')
+                        @can('roles.create')
                         <a href="{{route('roles.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Roles</span></a>
+                        @endrole
+                        @endrole
                     </div>
                     <div class="card-body">
                         @include('layouts.partials.messages')
@@ -41,8 +45,15 @@
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{$role->name}}</td>
 
-                                    <td><a href="{{route('roles.edit',$role->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                    <td>
+                                        @role('superadmin')
+                                        @can('roles.edit')
+                                        <a href="{{route('roles.edit',$role->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('roles.destroy')
                                         <a href="javascript:void(0);" onclick="event.preventDefault(); deleteRole('{{ $role->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
+                                        @endrole
                                     </td>
 
                                     <form method="post" action="{{route('roles.destroy', $role->id)}}" style="display:none" id="delete-form-{{$role->id}}">

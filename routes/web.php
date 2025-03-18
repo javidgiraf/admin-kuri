@@ -98,7 +98,7 @@ Route::group(['middleware' => ['auth', 'permission']], function () {
     Route::post('subscriptions-store', [UserController::class, 'subscriptionsStore'])->name('subscriptions.store');
     Route::get('subscriptions-edit/{id}', [UserController::class, 'subscriptionsEdit'])->name('subscriptions.edit');
     Route::put('subscriptions-update/{id}', [UserController::class, 'subscriptionsUpdate'])->name('subscriptions.update');
-    Route::post('subscriptions-delete/{id}', [UserController::class, 'subscriptionsDestroy'])->name('subscriptions.destroy');
+    Route::delete('subscriptions-delete/{id}', [UserController::class, 'subscriptionsDestroy'])->name('subscriptions.destroy');
     Route::get('current-plan-history', [UserController::class, 'currentPlanHistory'])->name('users.current-plan-history');
     Route::get('generate-random-number', [UserController::class, 'generateRandomNumber'])->name('users.generate-random-number');
     Route::get('edit-scheme-details/{user_subscription_id}/{user_id}/{scheme_id}', [UserController::class, 'editSchemeDetails'])->name('users.edit-scheme-details');

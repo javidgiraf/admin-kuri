@@ -21,7 +21,9 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>Manage States</b></h5>
+                        @can('states.create')
                         <a href="{{route('states.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add State</span></a>
+                        @endcan
                     </div>
                     <div class="card-body">
                         @include('layouts.partials.messages')
@@ -46,8 +48,13 @@
                                     <td>{{$state->name}}</td>
                                     <td>{{$state->code}}</td>
 
-                                    <td><a href="{{route('states.edit',encrypt($state->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                    <td>
+                                        @can('states.edit')
+                                        <a href="{{route('states.edit',encrypt($state->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('states.destroy')
                                         <a href="javascript:void(0);" onclick="event.preventDefault(); deleteState('{{ $state->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                     </td>
 
                                     <form method="post" action="{{route('states.destroy', encrypt($state->id))}}" style="display:none" id="delete-form-{{$state->id}}">

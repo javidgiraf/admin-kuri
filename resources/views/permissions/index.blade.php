@@ -21,7 +21,11 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>Manage Permissions</b></h5>
+                        @role('superadmin')
+                        @can('permissions.create')
                         <a href="{{route('permissions.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Permissions</span></a>
+                        @endcan
+                        @endrole
                     </div>
                     <div class="card-body">
                         @include('layouts.partials.messages')
@@ -44,11 +48,17 @@
                                     <th>{{$permission->name}}</th>
                                     <td>{{$permission->guard_name}}</td>
 
-                                    <td><a href="{{route('permissions.edit',$permission->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a><a href="javascript:void(0);" onclick="event.preventDefault(); deletePermission('{{ $permission->id }}');"><i class="bi bi-x-circle"></i></a></td>
-                                    <form method="post" action="{{route('permissions.destroy', $permission->id)}}" style="display:none" id="delete-form-{{$permission->id}}">
+                                    <td>
+                                        @role('superadmin')
+                                        @can('permissions.edit')
+                                        <a href="{{route('permissions.edit',$permission->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a><a href="javascript:void(0);" onclick="event.preventDefault(); deletePermission('{{ $permission->id }}');"><i class="bi bi-x-circle"></i></a></td>
+                                        @endcan
+                                        @endrole
+
+                                        <form method="post" action="{{route('permissions.destroy', $permission->id)}}" style="display:none" id="delete-form-{{$permission->id}}">
                                         @csrf
                                         @method('DELETE')
-                                    </form>
+                                        </form>
 
                                 </tr>
                                 @endforeach

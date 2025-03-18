@@ -134,6 +134,7 @@
                             @endphp
                             <td>
                                 {{$userSubscription->scheme?->title_en}}
+                                @can('change-scheme')
                                 @if($latestSubscription && $userSubscription->id == $latestSubscription->id)
                                 @if($latestClosedSubscription && !$hasActiveSubscription)
                                 <br>
@@ -143,6 +144,7 @@
                                     style="cursor: pointer;">{{ __('Join New Scheme') }}</a>
                                 @endif
                                 @endif
+                                @endcan
                             </td>
 
                             <td>
@@ -191,6 +193,7 @@
                             ?>
 
                             <td>
+                                @can('change-maturity-status')
                                 <a data-subscription-id="{{ $userSubscription->id }}"
                                     data-maturity-status="{{ $userSubscription->is_closed }}"
                                     data-bs-toggle="modal" data-bs-target="#changeMaturityStatusModal"
@@ -199,7 +202,9 @@
                                         {{ $userSubscription->is_closed == '0' ? "Open" : "Closed" }}
                                     </span>
                                 </a>
+                                @endcan
 
+                                @can('update-claim-status')
                                 @if($userSubscription->is_closed == true)
 
                                 <div class="form-check form-switch mt-2">
@@ -216,33 +221,42 @@
                                     </label>
                                 </div>
                                 @endif
+                                @endcan
                             </td>
 
-                            <td><a
+                            <td>
+                                @can('change-subscription-status')
+                                <a
                                     data-subscription-id="{{ $userSubscription->id }}"
                                     data-status="{{ $userSubscription->status }}"
                                     data-reason="{{ $userSubscription->reason }}"
                                     data-final-amount="{{ ($userSubscription->discontinue) ? $userSubscription->discontinue->final_amount : 0 }}"
                                     data-settlement-amount="{{ ($userSubscription->discontinue) ? $userSubscription->discontinue->settlement_amount : 0 }}"
-                                    data-bs-toggle="modal" data-bs-target="#changeStatusModal" style="cursor: pointer;" class="changeStatusBtn">{!! $status !!}</a></td>
+                                    data-bs-toggle="modal" data-bs-target="#changeStatusModal" style="cursor: pointer;" class="changeStatusBtn">{!! $status !!}</a>
+                                @endcan
+                            </td>
 
 
 
                             <td class="fixed-left">
+                                @can('users.edit-scheme-details')
                                 <a href="{{route('users.edit-scheme-details',[encrypt($userSubscription->id),encrypt($userSubscription->user?->id),encrypt($userSubscription->scheme?->id)])}}" style="margin-right: 10px;">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @endcan
                             </td>
 
                             <td class="fixed-left">
+                                @can('subscriptions.destroy')
                                 <a href="#" onclick="event.preventDefault(); deleteSubscription('{{ $userSubscription->id }}');" style="margin-right: 10px;">
                                     <i class="bi bi-trash"></i>
                                 </a>
+                                @endcan
 
-                                <!-- <form method="post" action="{{route('subscriptions.destroy', encrypt($userSubscription->id))}}" style="display:none" id="delete-form-{{$userSubscription->id}}">
+                                <form method="POST" action="{{route('subscriptions.destroy', encrypt($userSubscription->id))}}" style="display:none" id="delete-form-{{$userSubscription->id}}">
                                     @csrf
-                                    
-                                </form> -->
+                                    @method('DELETE')
+                                </form>
                             </td>
 
 

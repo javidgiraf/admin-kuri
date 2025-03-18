@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bank_transfers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('deposit_id');
-            $table->string('transaction_no');
+            $table->string('transaction_no')->nullable();
             $table->string('receipt_upload')->nullable(true);
             $table->text('remarks')->nullable(true);
             $table->tinyInteger('status')->default(0);

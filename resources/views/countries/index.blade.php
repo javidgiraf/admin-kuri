@@ -21,7 +21,9 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>Manage Countries</b></h5>
+                        @can('countries.create')
                         <a href="{{route('countries.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Countries</span></a>
+                        @endcan
                     </div>
                     <div class="card-body">
 
@@ -44,8 +46,13 @@
                                     <td>{{$country->name}}</td>
                                     <td>{{$country->code}}</td>
 
-                                    <td><a href="{{route('countries.edit',encrypt($country->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                    <td>
+                                        @can('countries.edit')
+                                        <a href="{{route('countries.edit',encrypt($country->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('countries.destroy')
                                         <a href="javascript:void(0);" onclick="event.preventDefault(); deleteCountry('{{ $country->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                     </td>
 
                                     <form method="post" action="{{route('countries.destroy', encrypt($country->id))}}" style="display:none" id="delete-form-{{$country->id}}">

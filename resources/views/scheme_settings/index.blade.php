@@ -21,7 +21,11 @@
         <div class="card">
           <div class="card-title d-flex justify-content-between m-3 mt-0">
             <h5><b>Manage Scheme Settings</b></h5>
+            @role('superadmin')
+            @can('scheme-settings.create')
             <a href="{{route('scheme-settings.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Scheme Setting</span></a>
+            @endcan
+            @endrole
           </div>
           <div class="card-body">
 
@@ -42,7 +46,7 @@
                 </tr>
               </thead>
               <tbody>
-                @if(count($schemeSettings) > 0)  
+                @if(count($schemeSettings) > 0)
                 @foreach ($schemeSettings as $setting)
                 <tr>
                   <td>{{ $loop->iteration + ($schemeSettings->currentPage() - 1) * $schemeSettings->perPage() }}</td>
@@ -53,17 +57,21 @@
                   <td>{{ $setting->due_duration }}</td>
                   <td>{{ ($setting->status == true) ? __('Active') : __('Inactive') }}</td>
                   <td>
-                    <a href="{{route('scheme-settings.edit', $setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
                     @role('superadmin')
-                      <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSchemeSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                    @can('scheme-settings.edit')
+                    <a href="{{route('scheme-settings.edit', $setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                    @endcan
+                    @can('scheme-settings.destroy')
+                    <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSchemeSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                    @endcan
                     @endrole
                   </td>
                 </tr>
                 @endforeach
                 @else
-                    <tr>
-                        <td colspan="8">No records available in table</td>
-                    </tr>
+                <tr>
+                  <td colspan="8">No records available in table</td>
+                </tr>
                 @endif
               </tbody>
             </table>

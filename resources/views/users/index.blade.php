@@ -115,7 +115,9 @@ use App\Services\UserService;
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>{{ __('Manage Customers') }}</b></h5>
+                        @can('users.create')
                         <a href="{{route('users.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Customer</span></a>
+                        @endcan
                     </div>
                     <div class="card-body table-responsive">
 
@@ -179,9 +181,15 @@ use App\Services\UserService;
                                     </td>
 
                                     <td>
+                                        @can('users.show')
                                         <a href="{{ route('users.show', encrypt($user->id)) }}" style="margin-right: 10px;"><i class="bi bi-eye"></i></a>
+                                        @endcan
+                                        @can('users.edit')
                                         <a href="{{ route('users.edit', encrypt($user->id)) }}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('users.destroy')
                                         <a href="javascript:void(0);" onclick="event.preventDefault(); deleteUser('{{ $user->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                     </td>
                                     <form method="post" action="{{route('users.destroy', encrypt($user->id))}}" style="display:none" id="delete-form-{{$user->id}}">
                                         @csrf

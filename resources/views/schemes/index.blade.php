@@ -20,7 +20,11 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between mt-0 m-3">
                         <h5><b>Manage Schemes</b></h5>
+                        @role('superadmin')
+                        @can('schemes.create')
                         <a href="{{route('schemes.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Schemes</span></a>
+                        @endcan
+                        @endrole
                     </div>
                     <div class="card-body">
 
@@ -46,9 +50,13 @@
                                     <td>{{ $scheme->schemeType?->title }}</td>
                                     <td>{{$scheme->total_period}}</td>
                                     <td>
-                                        <a href="{{ route('schemes.edit', encrypt($scheme->id)) }}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
                                         @role('superadmin')
-                                            <a href="javascript:void(0);" onclick="event.preventDefault(); deleteScheme('{{ $scheme->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @can('schemes.edit')
+                                        <a href="{{ route('schemes.edit', encrypt($scheme->id)) }}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('schemes.destroy')
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteScheme('{{ $scheme->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                         @endrole
                                     </td>
                                     <form method="post" action="{{ route('schemes.destroy', encrypt($scheme->id)) }}" style="display:none" id="delete-form-{{ $scheme->id }}">

@@ -21,14 +21,16 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>Manage Settings</b></h5>
+                        @can('settings.create')
                         <a href="{{route('settings.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add Setting</span></a>
+                        @endcan
                     </div>
                     <div class="card-body">
 
                         @include('layouts.partials.messages')
                         <!-- Table with stripped rows -->
                         <table class="table table-striped">
-                
+
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -45,9 +47,13 @@
                                     <td>{{ $setting->option_name }}</td>
                                     <td>{{ $setting->option_value }}</td>
                                     <td>
-                                        <a href="{{route('settings.edit', encrypt($setting->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
                                         @role('superadmin')
-                                            <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @can('settings.edit')
+                                        <a href="{{route('settings.edit', encrypt($setting->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('settings.destroy')
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                         @endrole
                                     </td>
 
@@ -59,9 +65,9 @@
                                 </tr>
                                 @endforeach
                                 @else
-                                    <tr>
-                                        <td colspan="4">No records available in table</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="4">No records available in table</td>
+                                </tr>
                                 @endif
 
                             </tbody>

@@ -21,7 +21,9 @@
                 <div class="card">
                     <div class="card-title d-flex justify-content-between m-3 mt-0">
                         <h5><b>Manage Districts</b></h5>
+                        @can('districts.create')
                         <a href="{{route('districts.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i> <span class="text-white">Add District</span></a>
+                        @endcan
                     </div>
                     <div class="card-body">
 
@@ -46,8 +48,13 @@
                                     <td>{{$district->name}}</td>
                                     <td>{{$district->code}}</td>
 
-                                    <td><a href="{{route('districts.edit',encrypt($district->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                    <td>
+                                        @can('districts.edit')
+                                        <a href="{{route('districts.edit',encrypt($district->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @endcan
+                                        @can('districts.destroy')
                                         <a href="javascript:void(0);" onclick="event.preventDefault(); deleteDistrict('{{ $district->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endcan
                                     </td>
 
                                     <form method="post" action="{{route('districts.destroy', encrypt($district->id))}}" style="display:none" id="delete-form-{{$district->id}}">
