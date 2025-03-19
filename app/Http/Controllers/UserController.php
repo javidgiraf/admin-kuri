@@ -471,6 +471,7 @@ class UserController extends Controller
                 return redirect()->route('users.get-user-subscriptions')->with('error', 'Deposit already exists for this subscription and cannot be deleted.');
             }
 
+            SubscriptionHistory::where('subscription_id', $id)->delete();
             UserSubscription::findOrFail($id)->delete();
 
             return redirect()->route('users.get-user-subscriptions')->with('success', 'Subscription deleted successfully');
