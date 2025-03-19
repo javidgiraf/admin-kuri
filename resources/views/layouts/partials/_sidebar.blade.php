@@ -7,13 +7,15 @@
 <aside id="sidebar" class="sidebar">
 
   <ul class="sidebar-nav" id="sidebar-nav">
-
+    @can('home')
     <li class="nav-item">
       <a class="nav-link {{ Route::is('home') ? '' : 'collapsed' }}" href=" {{route('home')}}">
         <i class="bi bi-house"></i>
         <span>{{ __('Dashboard') }}</span>
       </a>
     </li><!-- End Dashboard Nav -->
+    @endcan
+
     @can(['schemes.index'])
     <li class="nav-item">
       <a class="nav-link {{ Route::is('schemes.*') ? '' : 'collapsed' }}" href="{{route('schemes.index')}}">
@@ -55,7 +57,7 @@
       </a>
     </li>
     @endcan
-    
+
     @can(['users.index'])
     <li class="nav-item">
       <a class="nav-link {{ Route::is('users.*') ? '' : 'collapsed' }}" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
@@ -68,12 +70,14 @@
             <i class="bi bi-circle"></i><span>{{ __('Customers List') }}</span>
           </a>
         </li>
+
+        @can('users.get-user-subscriptions')
         <li>
           <a class="{{ Route::is('users.get-user-subscriptions')||Route::is('users.edit-scheme-details')? 'js' : ''}}" href="{{route('users.get-user-subscriptions')}}">
             <i class="bi bi-circle"></i><span>{{ __('Subscriptions') }}</span>
           </a>
         </li>
-
+        @endcan
 
       </ul>
     </li><!-- End Components Nav -->
@@ -82,7 +86,7 @@
     <li class="nav-item">
       <a class="nav-link {{ Route::is('deposits.*') ? '' : 'collapsed' }}" href="{{route('deposits.index')}}">
         <i class="bi bi-cart-check"></i>
-        <span>{{ __('Transactions') }}</span>
+        <span>{{ __('Deposits') }}</span>
       </a>
     </li>
     @endcan
@@ -104,20 +108,18 @@
     </li>
     @endcan -->
 
-
-
-    @can(['goldrates.index', 'countries.index', 'states.index', 'districts.index', 'scheme-settings.index'])
     <li class="nav-item">
       <a class="nav-link {{ Route::is('goldrates.*') || Route::is('logactivities.*') || Route::is('countries.*') || Route::is('states.*') || Route::is('districts.*') || Route::is('settings.*') || Route::is('scheme-settings.*')  ? '' : 'collapsed' }}" data-bs-target="#gold-rate-nav" data-bs-toggle="collapse" href="#">
         <i class="ri ri-settings-3-line"></i><span>{{ __('General Settings') }}</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
       <ul id="gold-rate-nav" class="nav-content collapse {{ Route::is('goldrates.*') || Route::is('logactivities.*') || Route::is('countries.*') || Route::is('states.*') || Route::is('districts.*') || Route::is('settings.*') || Route::is('scheme-settings.*')  ? 'show' : '' }} " data-bs-parent="#sidebar-nav">
-
+        @can('goldrates.index')
         <li>
           <a class="{{ Route::is('goldrates.*')? 'js' : ''}}" href="{{route('goldrates.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Gold Rate') }}</span>
           </a>
         </li>
+        @endcan
 
         @role('superadmin')
         <li>
@@ -127,39 +129,48 @@
         </li>
         @endrole
 
+        @can('countries.index')
         <li>
           <a class="{{ Route::is('countries.*')? 'js' : ''}}" href="{{route('countries.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Countries') }}</span>
           </a>
         </li>
+        @endcan
+
+        @can('states.index')
         <li>
           <a class="{{ Route::is('states.*')? 'js' : ''}}" href="{{route('states.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('States') }}</span>
           </a>
         </li>
+        @endcan
+
+        @can('districts.index')
         <li>
           <a class="{{ Route::is('districts.*')? 'js' : ''}}" href="{{route('districts.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Districts') }}</span>
           </a>
         </li>
+        @endcan
 
         <!-- <li>
           <a class="{{ Route::is('settings.*')? 'js' : ''}}" href="{{route('settings.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Settings') }}</span>
           </a>
         </li> -->
+
+        @can('scheme-settings.index')
         <li>
           <a class="{{ Route::is('scheme-settings.*')? 'js' : ''}}" href="{{route('scheme-settings.index')}}">
             <i class="bi bi-circle"></i><span>{{ __('Scheme Settings') }}</span>
           </a>
         </li>
+        @endcan
 
 
 
       </ul>
     </li>
-
-    @endcan
 
 
   </ul>
