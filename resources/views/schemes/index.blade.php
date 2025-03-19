@@ -86,6 +86,15 @@
 
 @push('scripts')
 <script>
+    <?php if ($message = session('error')): ?>
+        swal({
+            title: "Warning",
+            text: "{{ $message }}",
+            icon: "warning",
+            buttons: true,
+        });
+    <?php endif; ?>
+    
     function deleteScheme(id) {
 
         swal({

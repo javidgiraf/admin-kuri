@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 // use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\SchemeSetting;
+use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 
 use App\Services\SchemeService;
@@ -66,7 +68,7 @@ class SchemeController extends Controller
     {
         $id = decrypt($id);
         $input = $request->all();
-        $input['pdf_file'] = $request->hasFile('pdf_file') ? 
+        $input['pdf_file'] = $request->hasFile('pdf_file') ?
             $request->file('pdf_file') : NULL;
         $scheme = $schemeService->getScheme($id);
         $schemeService->updateScheme($scheme, $input);
@@ -81,12 +83,20 @@ class SchemeController extends Controller
     public function destroy(string $id, SchemeService $schemeService)
     {
         $id = decrypt($id);
+
+        if (SchemeSetting::where('scheme_id', $id)->exists()) {
+            return redirect()->route('schemes.index')->with('error', 'Scheme Settings already exists for this scheme and cannot be deleted.');
+        }
+
+        if (UserSubscription::where('scheme_id', $id)->exists()) {
+            return redirect()->route('schemes.index')->with('error', 'User Subscription already exists for this scheme and cannot be deleted.');
+        }
+
         $scheme = $schemeService->getScheme($id);
         $schemeService->deleteScheme($scheme);
         LogActivity::addToLog('Scheme ' . $scheme->title . ' removed by ' . auth()->user()->name);
 
-        return redirect()->back()
+        return redirect()->route('schemes.index')
             ->with('success', 'Scheme deleted successfully');
     }
-
 }
