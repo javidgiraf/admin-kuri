@@ -1,472 +1,476 @@
 @if($current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN)
-      <h5 class="card-title">Unpaid List</h5>
-      @endif
+<h5 class="card-title">Unpaid List</h5>
+@endif
 
-      <style>
-        .change {
-          padding: 10px;
-          border: 1px solid #4154f1;
-          font-weight: 700;
-          text-align: center;
-          color: white;
-          background: #4154f1;
-        }
+<style>
+  .change {
+    padding: 10px;
+    border: 1px solid #4154f1;
+    font-weight: 700;
+    text-align: center;
+    color: white;
+    background: #4154f1;
+  }
 
-        .total-amount {
-          font-weight: 700;
-          text-align: end;
-        }
-      </style>
-      <p class="change">
-        Please check the list of unpaid date to pay from admin.
-      </p>
+  .total-amount {
+    font-weight: 700;
+    text-align: end;
+  }
+</style>
+<p class="change">
+  Please check the list of unpaid date to pay from admin.
+</p>
 
-      <div class="success"></div>
-      <div class="error_transaction_msg"></div>
+<div class="success"></div>
+<div class="error_transaction_msg"></div>
 
-      <table class="table" id="upaid-list" width="100%">
-        <thead>
-          <tr>
-            <th scope="col">
-              @if($current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN)
-              <input type="checkbox" name="all_permission" class="all_permission">
-              @else
-              SI No
-              @endif
-            </th>
-            <th scope="col">Date</th>
-            <th scope="col">Amount</th>
-            <th></th>
-
-          </tr>
-        </thead>
-
-        @php
-        $schemeSetting = \App\Models\SchemeSetting::where(
-        'scheme_id',
-        $current_plan_history['scheme']->id
-        )->first();
-
-        @endphp
-
-        <tbody>
-          @if(
-            $current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN
-            || (
-              $current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN
-              && $currentDate->greaterThanOrEqualTo($endSixMonthPeriod)
-            )
-          )
-          @if(count($current_plan_history['result_dates']) > 0)
-          @foreach($current_plan_history['result_dates'] as $result_date)
-
-          @if($result_date['status']=='0'||$result_date['status']=='2')
-          <tr id="tableRow_{{$result_date['date']}}">
-            <th scope="row">
-              <input type="checkbox" id="{{$result_date['date']}}" class='permission'>
-
-            </th>
-            <td id="date{{$result_date['date']}}">{{ $result_date['date'] }}</td>
-            <td width="30%" id="amount{{$result_date['date']}}">{{ $result_date['amount'] }} </td>
-            <td></td>
-
-
-          </tr>
-          @endif
-          @endforeach
-
-          @else
-          <tr>
-            <td colspan="3">No Records available in table</td>
-          </tr>
-          @endif
-          @else
-          <tr>
-            <td class="siNo">
-              1
-            </td>
-            <td><input type="date" name="payment_date[]" class="form-control payment_date" value="{{ date('Y-m-d') }}"></td>
-            <td>
-              <input type="number"
-                name="payment_amount[]"
-                class="form-control payment_amount"
-                min="{{ $schemeSetting->min_payable_amount }}"
-                max="{{ $schemeSetting->max_payable_amount }}"
-                required>
-            </td>
-            <td>
-                @if($currentDate->lessThan($endSixMonthPeriod))
-                    <a class="btn btn-danger btn-remove"><i class="bi bi-basket"></i></a></td>
-                @endif
-          </tr>
-          @endif
-        </tbody>
-        @if($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN)
-        <tfoot>
-          <tr>
-            <td colspan="4">
-              @if($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN)
-              <span class="totalPaid"><b>{{ __('Total Paid') }} : {{ number_format($current_plan_history['totalPaidAmount'], 2) }}</b></span>
-              @endif
-              @if($currentDate->lessThan($endSixMonthPeriod))
-                <a class="btn-plus btn btn-success" style="float: right;"><i class="bi bi-plus"></i></a>
-              @endif
-            </td>
-          </tr>
-        </tfoot>
+<table class="table" id="upaid-list" width="100%">
+  <thead>
+    <tr>
+      <th scope="col">
+        @if($current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN)
+        <input type="checkbox" name="all_permission" class="all_permission">
+        @else
+        SI No
         @endif
-      </table>
+      </th>
+      <th scope="col">Date</th>
+      <th scope="col">Amount</th>
+      <th></th>
+
+    </tr>
+  </thead>
+
+  @php
+  $schemeSetting = \App\Models\SchemeSetting::where(
+  'scheme_id',
+  $current_plan_history['scheme']->id
+  )->first();
+
+  @endphp
+
+  <tbody>
+    @if(
+    $current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN
+    || (
+    $current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN
+    && $currentDate->greaterThanOrEqualTo($endSixMonthPeriod)
+    )
+    )
+    @if(count($current_plan_history['result_dates']) > 0)
+    @foreach($current_plan_history['result_dates'] as $result_date)
+
+    @if($result_date['status']=='0'||$result_date['status']=='2')
+    <tr id="tableRow_{{$result_date['date']}}">
+      <th scope="row">
+        <input type="checkbox" id="{{$result_date['date']}}" class='permission'>
+
+      </th>
+      <td id="date{{$result_date['date']}}">{{ $result_date['date'] }}</td>
+      <td width="30%" id="amount{{$result_date['date']}}">{{ $result_date['amount'] }} </td>
+      <td></td>
 
 
-      <div class="col-md-12 d-flex justify-content-end">
-        <input type="button" class="btn btn-success btn-add-deposit-model" <?= $current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN ? 'disabled' : '' ?> id="submit" value="Submit" style="background:#4154f1;">
+    </tr>
+    @endif
+    @endforeach
 
+    @else
+    <tr>
+      <td colspan="3">No Records available in table</td>
+    </tr>
+    @endif
+    @else
+    <tr>
+      <td class="siNo">
+        1
+      </td>
+      <td><input type="date" name="payment_date[]" class="form-control payment_date" value="{{ date('Y-m-d') }}"></td>
+      <td>
+        <input type="number"
+          name="payment_amount[]"
+          class="form-control payment_amount"
+          min="{{ $schemeSetting->min_payable_amount }}"
+          max="{{ $schemeSetting->max_payable_amount }}"
+          required>
+      </td>
+      <td>
+        @if($currentDate->lessThan($endSixMonthPeriod))
+        <a class="btn btn-danger btn-remove"><i class="bi bi-basket"></i></a>
+      </td>
+      @endif
+    </tr>
+    @endif
+  </tbody>
+  @if($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN)
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        @if($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN)
+        <span class="totalPaid"><b>{{ __('Total Paid') }} : {{ number_format($current_plan_history['totalPaidAmount'], 2) }}</b></span>
+        @endif
+        @if($currentDate->lessThan($endSixMonthPeriod))
+        <a class="btn-plus btn btn-success" style="float: right;"><i class="bi bi-plus"></i></a>
+        @endif
+      </td>
+    </tr>
+  </tfoot>
+  @endif
+</table>
+
+
+<div class="col-md-12 d-flex justify-content-end">
+  <input type="button" class="btn btn-success btn-add-deposit-model" <?= $current_plan_history['scheme']['scheme_type_id'] == \App\Models\SchemeType::FIXED_PLAN ? 'disabled' : '' ?> id="submit" value="Submit" style="background:#4154f1;">
+
+</div>
+<div class="col-lg-2"></div>
+
+
+</div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Pay the deposit</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="col-lg-2"></div>
-      
+      <div class="modal-body">
+        <div id="yu" style="overflow:auto;height:200px;">
+          <table id="permissionsTable" class="table">
+            <!-- Table headers (if any) -->
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <!-- Table body -->
+            <tbody>
+              <!-- Table rows will be dynamically added here -->
+            </tbody>
 
-      </div>
-      </div>
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Pay the deposit</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div id="yu" style="overflow:auto;height:200px;">
-                <table id="permissionsTable" class="table">
-                  <!-- Table headers (if any) -->
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <!-- Table body -->
-                  <tbody>
-                    <!-- Table rows will be dynamically added here -->
-                  </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <div class="card-body">
+            <h5 class="card-title" style="text-align: left;">Enter Transaction Details</h5>
+            <div id="frmtrasaction"></div>
 
-                </table>
-              </div>
-              <div class="row">
-                <div class="card-body">
-                  <h5 class="card-title" style="text-align: left;">Enter Transaction Details</h5>
-                  <div id="frmtrasaction"></div>
-
-                  <!-- Horizontal Form -->
-                  <form id="frm_transation_details">
-                    <div class="row mb-3">
-                      <!-- <label for="inputEmail3" class="col-sm-12 col-form-label">Transaction No</label> -->
-                      <div class="col-sm-12">
-                        <input type="text" class="form-control" id="transaction_no" name="transaction_no">
-                        <span class="transaction_no"></span>
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputEmail3" class="col-sm-12 col-form-label">Receipt Upload</label>
-                      <div class="col-sm-12">
-                        <input type="file" class="form-control" name="receipt_upload" id="receipt_upload" accept=".svg,.png,.jpeg,.jpg,.webp,.pdf">
-                        <span class="receipt_upload"></span>
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputEmail3" class="col-sm-12 col-form-label">Payment Method</label>
-                      <div class="col-sm-12">
-                        <select name="payment_method" class="form-control" id="payment_method">
-                          <option value="">Select</option>
-                          <option value="cash">Cash</option>
-                          <option value="bank">Bank</option>
-                          <option value="upi">Upi</option>
-                        </select>
-                        <span class="payment_method"></span>
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputPassword3" class="col-sm-12 col-form-label">Payment Response</label>
-                      <div class="col-sm-12">
-                        <textarea class="form-control" id="payment_response" name="payment_response"></textarea>
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputPassword3" class="col-sm-12 col-form-label">Remark</label>
-                      <div class="col-sm-12">
-                        <textarea class="form-control" id="remark" name="remark"></textarea>
-                      </div>
-                    </div>
-                    <div class="col-md-12" id="transaction-loading" style="text-align: center;display:none">
-                      <img src="{{asset('assets/img/loading.gif')}}" style="width: 25%;">
-                    </div>
-
-                  </form><!-- End Horizontal Form -->
-
+            <!-- Horizontal Form -->
+            <form id="frm_transation_details">
+              <div class="row mb-3">
+                <!-- <label for="inputEmail3" class="col-sm-12 col-form-label">Transaction No</label> -->
+                <div class="col-sm-12">
+                  <input type="text" class="form-control" id="transaction_no" name="transaction_no">
+                  <span class="transaction_no"></span>
                 </div>
               </div>
-
-              <div class="row total-amount">
-                <p>Total Amount : ₹ <span id="total-amount-value"></span></p>
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-12 col-form-label">Receipt Upload</label>
+                <div class="col-sm-12">
+                  <input type="file" class="form-control" name="receipt_upload" id="receipt_upload" accept=".svg,.png,.jpeg,.jpg,.webp,.pdf">
+                  <span class="receipt_upload"></span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-12 col-form-label">Payment Method</label>
+                <div class="col-sm-12">
+                  <select name="payment_method" class="form-control" id="payment_method">
+                    <option value="">Select</option>
+                    <option value="cash">Cash</option>
+                    <option value="bank">Bank</option>
+                    <option value="upi">Upi</option>
+                  </select>
+                  <span class="payment_method"></span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputPassword3" class="col-sm-12 col-form-label">Payment Response</label>
+                <div class="col-sm-12">
+                  <textarea class="form-control" id="payment_response" name="payment_response"></textarea>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputPassword3" class="col-sm-12 col-form-label">Remark</label>
+                <div class="col-sm-12">
+                  <textarea class="form-control" id="remark" name="remark"></textarea>
+                </div>
+              </div>
+              <div class="col-md-12" id="transaction-loading" style="text-align: center;display:none">
+                <img src="{{asset('assets/img/loading.gif')}}" style="width: 25%;">
               </div>
 
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary btn-pay-deposit">Save changes</button>
-              <div class="col-md-12" id="loading" style="text-align: center;display:none">
-                <img src="{{asset('assets/img/loading.gif')}}" style="width: 35%;">
-              </div>
-            </div>
+            </form><!-- End Horizontal Form -->
+
           </div>
         </div>
+
+        <div class="row total-amount">
+          <p>Total Amount : ₹ <span id="total-amount-value"></span></p>
+        </div>
+
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-pay-deposit">Save changes</button>
+        <div class="col-md-12" id="loading" style="text-align: center;display:none">
+          <img src="{{asset('assets/img/loading.gif')}}" style="width: 35%;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-      <script>
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-        });
+<script>
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
 
 
-        function number_format(number, decimals, dec_point, thousands_sep) {
-          number = parseFloat(number);
-          if (!isFinite(number) || !Number.isInteger(decimals) || decimals < 0) {
-            throw new TypeError('number_format: invalid parameters');
-          }
-          decimals = decimals || 0;
-          dec_point = dec_point || '.';
-          thousands_sep = thousands_sep || ',';
-          var parts = number.toFixed(decimals).toString().split('.');
-          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
-          return parts.join(dec_point);
+  function number_format(number, decimals, dec_point, thousands_sep) {
+    number = parseFloat(number);
+    if (!isFinite(number) || !Number.isInteger(decimals) || decimals < 0) {
+      throw new TypeError('number_format: invalid parameters');
+    }
+    decimals = decimals || 0;
+    dec_point = dec_point || '.';
+    thousands_sep = thousands_sep || ',';
+    var parts = number.toFixed(decimals).toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
+    return parts.join(dec_point);
+  }
+
+  var table = $('#permissionsTable');
+
+  function clearTable() {
+    table.find("tr:gt(0)").remove(); // Remove all rows except the header
+    $('#total-amount-value').val('0');
+  }
+  var checkedPermissions = [];
+  var totalAmount = 0;
+  $('.btn-add-deposit-model').on('click', function() {
+    $('.error_transaction_msg').removeClass('alert alert-danger').html('');
+    clearTable(); // Clear the table before appending new rows
+    totalAmount = 0; // Reset total amount
+    checkedPermissions = []; // Reset the permissions array
+    let hasZeroAmount = false; // Flag to track zero amounts
+
+    $.each($('.permission'), function() {
+      if ($(this).is(':checked')) {
+        const id = $(this).attr('id');
+        const date = id;
+        let amount = $('#amount' + id).html();
+
+        // If amount is not set in the table cell, check input field
+        if (!amount || isNaN(amount)) {
+          amount = $("#deposit_amount" + id).val();
         }
 
-        var table = $('#permissionsTable');
+        amount = parseFloat(amount || 0); // Ensure amount is a valid number
 
-        function clearTable() {
-          table.find("tr:gt(0)").remove(); // Remove all rows except the header
-          $('#total-amount-value').val('0');
+        if (amount === 0) {
+          hasZeroAmount = true; // Set flag if zero amount is found
         }
-        var checkedPermissions = [];
-        var totalAmount = 0;
-        $('.btn-add-deposit-model').on('click', function() {
-          $('.error_transaction_msg').removeClass('alert alert-danger').html('');
-          clearTable(); // Clear the table before appending new rows
-          totalAmount = 0; // Reset total amount
-          checkedPermissions = []; // Reset the permissions array
-          let hasZeroAmount = false; // Flag to track zero amounts
 
-          $.each($('.permission'), function() {
-            if ($(this).is(':checked')) {
-              const id = $(this).attr('id');
-              const date = id;
-              let amount = $('#amount' + id).html();
+        totalAmount += amount; // Add to total amount
 
-              // If amount is not set in the table cell, check input field
-              if (!amount || isNaN(amount)) {
-                amount = $("#deposit_amount" + id).val();
-              }
-
-              amount = parseFloat(amount || 0); // Ensure amount is a valid number
-
-              if (amount === 0) {
-                hasZeroAmount = true; // Set flag if zero amount is found
-              }
-
-              totalAmount += amount; // Add to total amount
-
-              // Push the permission object to the array
-              checkedPermissions.push({
-                date: date,
-                amount: amount
-              });
-
-              // Create the table row
-              const row = $('<tr>').append(
-                $('<td>').text(date),
-                $('<td>').text(number_format(amount, 2, '.', ','))
-              );
-              table.append(row);
-            }
-          });
-
-          // Show error message if zero amount is detected
-          // if (hasZeroAmount || totalAmount == 0) {
-
-          //   toastr.error('Error: One or more selected items have an amount of zero. Please check and update the amounts.');
-          //   return false;
-          // }
-
-          // Display the modal if validation passes
-          $('#total-amount-value').text(number_format(totalAmount, 2, '.', ','));
-          $('#exampleModal').modal('show');
+        // Push the permission object to the array
+        checkedPermissions.push({
+          date: date,
+          amount: amount
         });
-      </script>
-      <script>
-        $(document).ready(function() {
 
-          // $('.btn-add-deposit-model').prop('disabled', true);
-          $('[name="all_permission" ]').on('click', function() {
-            $('.btn-add-deposit-model').prop('disabled', false);
-            if ($(this).is(':checked')) {
-              $.each($('.permission'), function() {
-                $(this).prop('checked', true);
-              });
-            } else {
-              $.each($('.permission'), function() {
-                $(this).prop('checked', false);
-                $('.btn-add-deposit-model').prop('disabled', true);
-              });
-            }
-          });
+        // Create the table row
+        const row = $('<tr>').append(
+          $('<td>').text(date),
+          $('<td>').text(number_format(amount, 2, '.', ','))
+        );
+        table.append(row);
+      }
+    });
 
-          <?php if ($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN): ?>
+    // Show error message if zero amount is detected
+    // if (hasZeroAmount || totalAmount == 0) {
 
-            function siNo() {
-              let i = 1;
-              $(".siNo").each(function() {
-                $(this).text(i);
-                i++;
-              });
-            }
+    //   toastr.error('Error: One or more selected items have an amount of zero. Please check and update the amounts.');
+    //   return false;
+    // }
 
-            // Add new row
-            $("#upaid-list").on("click", ".btn-plus", function() {
-              let html = `
+    // Display the modal if validation passes
+    $('#total-amount-value').text(number_format(totalAmount, 2, '.', ','));
+    if (totalAmount != 0) {
+      $('#exampleModal').modal('show');
+    }
+  });
+</script>
+<script>
+  $(document).ready(function() {
+
+    // $('.btn-add-deposit-model').prop('disabled', true);
+    $('[name="all_permission" ]').on('click', function() {
+      $('.btn-add-deposit-model').prop('disabled', false);
+      if ($(this).is(':checked')) {
+        $.each($('.permission'), function() {
+          $(this).prop('checked', true);
+        });
+      } else {
+        $.each($('.permission'), function() {
+          $(this).prop('checked', false);
+          $('.btn-add-deposit-model').prop('disabled', true);
+        });
+      }
+    });
+
+    <?php if ($current_plan_history['scheme']['scheme_type_id'] !== \App\Models\SchemeType::FIXED_PLAN): ?>
+
+      function siNo() {
+        let i = 1;
+        $(".siNo").each(function() {
+          $(this).text(i);
+          i++;
+        });
+      }
+
+      // Add new row
+      $("#upaid-list").on("click", ".btn-plus", function() {
+        let html = `
     <tr>
       <td class="siNo"></td>
       <td><input type="date" name="payment_date[]" class="form-control payment_date" value="{{ date('Y-m-d') }}"></td>
       <td><input type="number" name="payment_amount[]" class="form-control payment_amount"></td>
       <td><a class="btn btn-danger btn-remove"><i class="bi bi-basket"></i></a></td>
     </tr>`;
-              $("#upaid-list tbody").append(html);
-              siNo();
-            });
+        $("#upaid-list tbody").append(html);
+        siNo();
+      });
 
-            // Remove row
-            $("#upaid-list").on("click", ".btn-remove", function() {
-              $(this).closest("tr").remove();
-              siNo();
-            });
+      // Remove row
+      $("#upaid-list").on("click", ".btn-remove", function() {
+        $(this).closest("tr").remove();
+        siNo();
+      });
 
-            // Submit data
-            $(document).on("click", "#submit", function(e) {
-              let isValid = true;
-              let paymentData = [];
-              // checkedPermissions = [];
+      // Submit data
+      $(document).on("click", "#submit", function(e) {
+        let isValid = true;
+        let paymentData = [];
+        // checkedPermissions = [];
 
-              // Clear previous validation errors
-              $(".is-invalid").removeClass("is-invalid");
-              $(".invalid-feedback").remove();
+        // Clear previous validation errors
+        $(".is-invalid").removeClass("is-invalid");
+        $(".invalid-feedback").remove();
 
-              // Convert min/max amounts from Blade to numbers
-              let minAmount = <?= $schemeSetting->min_payable_amount ?>;
-              let maxAmount = <?= $schemeSetting->max_payable_amount ?>;
+        // Convert min/max amounts from Blade to numbers
+        let minAmount = <?= $schemeSetting->min_payable_amount ?>;
+        let maxAmount = <?= $schemeSetting->max_payable_amount ?>;
 
-              // Validate all rows
-              $("#upaid-list tbody tr").each(function() {
-                const payment_date = $(this).find(".payment_date").val();
-                const payment_amount = $(this).find(".payment_amount").val();
-                let rowValid = true;
-                let paymentAmountNum = parseFloat(payment_amount); // Convert input to number
+        // Validate all rows
+        $("#upaid-list tbody tr").each(function() {
+          const payment_date = $(this).find(".payment_date").val();
+          const payment_amount = $(this).find(".payment_amount").val();
+          let rowValid = true;
+          let paymentAmountNum = parseFloat(payment_amount); // Convert input to number
 
-                // Validate payment_date
-                if (!payment_date) {
-                  $(this)
-                    .find(".payment_date")
-                    .after('<div class="invalid-feedback">Payment date is required.</div>')
-                    .addClass("is-invalid");
-                  rowValid = false;
-                }
-
-                // Validate payment_amount
-                if (!payment_amount || isNaN(paymentAmountNum) || paymentAmountNum <= 0) {
-                  $(this)
-                    .find(".payment_amount")
-                    .after('<div class="invalid-feedback">Payment amount must be a positive number.</div>')
-                    .addClass("is-invalid");
-                  rowValid = false;
-                } else if (paymentAmountNum < minAmount) {
-                  $(this)
-                    .find(".payment_amount")
-                    .after(`<div class="invalid-feedback">Minimum payment amount is ${minAmount}.</div>`)
-                    .addClass("is-invalid");
-                  rowValid = false;
-                } else if (paymentAmountNum > maxAmount) {
-                  $(this)
-                    .find(".payment_amount")
-                    .after(`<div class="invalid-feedback">Maximum payment amount is ${maxAmount}.</div>`)
-                    .addClass("is-invalid");
-                  rowValid = false;
-                }
-
-                // Collect valid data
-                if (rowValid) {
-                  paymentData.push({
-                    date: payment_date,
-                    amount: paymentAmountNum,
-                  });
-
-                  checkedPermissions.push({
-                    date: payment_date,
-                    amount: paymentAmountNum
-                  });
-                }
-
-                isValid = isValid && rowValid;
-              });
-
-              // Stop execution if validation fails
-              if (!isValid) {
-                return;
-              }
-
-              $("#exampleModal").modal("show");
-
-              // Append rows to permissions table
-              const tableBody = $("#permissionsTable tbody");
-              tableBody.empty(); // Clear existing rows
-              totalAmount = 0;
-              
-              paymentData.forEach((data) => {
-                const row = $("<tr>").append(
-                  $("<td>").text(data.date),
-                  $("<td>").text(number_format(data.amount, 2, ".", ","))
-                );
-                tableBody.append(row);
-                totalAmount += data.amount;
-              });
-
-              // Update total amount
-              $("#total-amount-value").text(number_format(totalAmount, 2, ".", ","));
-            });
-
-
-            // Number formatting function
-            function number_format(number, decimals, dec_point, thousands_sep) {
-              number = parseFloat(number).toFixed(decimals);
-              const parts = number.split(".");
-              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
-              return parts.join(dec_point);
-            }
-
-          <?php endif; ?>
-
-        });
-
-
-
-        function checkIfAnyChecked() {
-          return $('.permission:checked').length > 0;
-        }
-        $(document).delegate(".permission", "click", function() {
-          if ($(this).is(':checked')) {
-            $('.btn').prop('disabled', false);
-          } else {
-            $('.btn').prop('disabled', !checkIfAnyChecked());
-            //$('.btn').prop('disabled', true);
+          // Validate payment_date
+          if (!payment_date) {
+            $(this)
+              .find(".payment_date")
+              .after('<div class="invalid-feedback">Payment date is required.</div>')
+              .addClass("is-invalid");
+            rowValid = false;
           }
+
+          // Validate payment_amount
+          if (!payment_amount || isNaN(paymentAmountNum) || paymentAmountNum <= 0) {
+            $(this)
+              .find(".payment_amount")
+              .after('<div class="invalid-feedback">Payment amount must be a positive number.</div>')
+              .addClass("is-invalid");
+            rowValid = false;
+          } else if (paymentAmountNum < minAmount) {
+            $(this)
+              .find(".payment_amount")
+              .after(`<div class="invalid-feedback">Minimum payment amount is ${minAmount}.</div>`)
+              .addClass("is-invalid");
+            rowValid = false;
+          } else if (paymentAmountNum > maxAmount) {
+            $(this)
+              .find(".payment_amount")
+              .after(`<div class="invalid-feedback">Maximum payment amount is ${maxAmount}.</div>`)
+              .addClass("is-invalid");
+            rowValid = false;
+          }
+
+          // Collect valid data
+          if (rowValid) {
+            paymentData.push({
+              date: payment_date,
+              amount: paymentAmountNum,
+            });
+
+            checkedPermissions.push({
+              date: payment_date,
+              amount: paymentAmountNum
+            });
+          }
+
+          isValid = isValid && rowValid;
         });
-      </script>
+
+        // Stop execution if validation fails
+        if (!isValid) {
+          return;
+        }
+
+
+        $('#exampleModal').modal('show');
+
+        // Append rows to permissions table
+        const tableBody = $("#permissionsTable tbody");
+        tableBody.empty(); // Clear existing rows
+        totalAmount = 0;
+
+        paymentData.forEach((data) => {
+          const row = $("<tr>").append(
+            $("<td>").text(data.date),
+            $("<td>").text(number_format(data.amount, 2, ".", ","))
+          );
+          tableBody.append(row);
+          totalAmount += data.amount;
+        });
+
+        // Update total amount
+        $("#total-amount-value").text(number_format(totalAmount, 2, ".", ","));
+      });
+
+
+      // Number formatting function
+      function number_format(number, decimals, dec_point, thousands_sep) {
+        number = parseFloat(number).toFixed(decimals);
+        const parts = number.split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
+        return parts.join(dec_point);
+      }
+
+    <?php endif; ?>
+
+  });
+
+
+
+  function checkIfAnyChecked() {
+    return $('.permission:checked').length > 0;
+  }
+  $(document).delegate(".permission", "click", function() {
+    if ($(this).is(':checked')) {
+      $('.btn').prop('disabled', false);
+    } else {
+      $('.btn').prop('disabled', !checkIfAnyChecked());
+      //$('.btn').prop('disabled', true);
+    }
+  });
+</script>
