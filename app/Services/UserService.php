@@ -193,10 +193,12 @@ class UserService
 
     public function getCurrentPlanHistory($user_subscription_id, $user_id, $scheme_id)
     {
-        $user_subscription = UserSubscription::with('scheme.schemeType')
+        $user_subscription = UserSubscription::with('scheme.schemeType', 'scheme.schemeSetting')
             ->where('user_id', $user_id)
             ->where('scheme_id', $scheme_id)
             ->findOrFail($user_subscription_id);
+        $schemeType = $user_subscription->scheme->schemeType;
+        $dueDuration = $user_subscription->scheme->schemeSetting->due_duration;    
 
         $user_subscription_deposits = Deposit::where('subscription_id', $user_subscription_id)->get();
 
@@ -243,9 +245,17 @@ class UserService
             })
             ->flatten()
             ->toArray();
+            
+            
 
         // Extract the months from $due_dates
-        $due_months = array_map(function ($date) {
+        $due_months = array_map(function ($date) use ($currentDate, $endSixMonthPeriod, $schemeType, $dueDuration) {
+            if (
+                $currentDate->greaterThanOrEqualTo($endSixMonthPeriod) && $schemeType->id !== SchemeType::FIXED_PLAN 
+                || $schemeType->id == SchemeType::FIXED_PLAN) {
+                
+                $date = Carbon::parse($date)->startOfMonth()->addMonths(1)->addDays($dueDuration);
+            }
             return Carbon::parse($date)->format('Y-m'); // Format as "YYYY-MM"
         }, $due_dates);
 
@@ -425,29 +435,29 @@ class UserService
             foreach (json_decode($userData['checkdata'], true) as $item) {
                 $dueDate = Carbon::parse($item['date']);
 
-                if ($dueDate->greaterThan($currentDate)) {
-                    throw new \Exception('The payment date cannot be after the current date.');
-                }
+                // if ($dueDate->greaterThan($currentDate)) {
+                //     throw new \Exception('The payment date cannot be after the current date.');
+                // }
 
                 // Ensure payments are only made within the first 6 months
                 if ($currentDate->greaterThan($endSixMonthPeriod) && $item['amount'] > round($allowedAmount) && $schemeType->id !== SchemeType::FIXED_PLAN) {
                     throw new \Exception("The deposit amount exceeds the allowable amount of " . round($allowedAmount) . " during the first 6 months.");
                 }
 
-                $monthKey = $dueDate->format('Y-m');
-                $existingPayments = DepositPeriod::whereHas('deposit', function ($query) use ($user_subscription) {
-                    $query->where('subscription_id', $user_subscription->id);
-                })
-                    ->where('due_date', '>=', $endSixMonthPeriod->format('Y-m-d'))
-                    ->whereRaw("DATE_FORMAT(due_date, '%Y-%m') = ?", [$monthKey])
-                    ->exists();
-                if (
-                    $existingPayments
-                    && $currentDate->greaterThan($endSixMonthPeriod)
-                    && $schemeType->id !== SchemeType::FIXED_PLAN
-                ) {
-                    throw new \Exception("Only one payment per month is allowed for the month of " . $dueDate->format('F Y'));
-                }
+                // $monthKey = $dueDate->format('Y-m');
+                // $existingPayments = DepositPeriod::whereHas('deposit', function ($query) use ($user_subscription) {
+                //     $query->where('subscription_id', $user_subscription->id);
+                // })
+                //     ->where('due_date', '>=', $endSixMonthPeriod->format('Y-m-d'))
+                //     ->whereRaw("DATE_FORMAT(due_date, '%Y-%m') = ?", [$monthKey])
+                //     ->exists();
+                // if (
+                //     $existingPayments
+                //     && $currentDate->greaterThan($endSixMonthPeriod)
+                //     && $schemeType->id !== SchemeType::FIXED_PLAN
+                // ) {
+                //     throw new \Exception("Only one payment per month is allowed for the month of " . $dueDate->format('F Y'));
+                // }
             }
 
             // Step 3: Create deposit record
@@ -477,16 +487,14 @@ class UserService
             }
 
             foreach (json_decode($userData['checkdata'], true) as $item) {
+                
                 $dueDate = Carbon::parse($item['date']);
 
-                if ($schemeType->id == SchemeType::FIXED_PLAN) {
-                    $dueDate = Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
-                }
-
-                if ($currentDate->greaterThanOrEqualTo($endSixMonthPeriod) && $schemeType->id !== SchemeType::FIXED_PLAN) {
-                    $dueDate = (Carbon::parse($item['date'])->format('d') > 15) ?
-                        Carbon::parse($item['date'])->addMonths(1)->startOfMonth()->addDays($dueDuration)
-                        : Carbon::parse($item['date'])->startOfMonth()->addDays($dueDuration);
+                if (
+                    $currentDate->greaterThanOrEqualTo($endSixMonthPeriod) && $schemeType->id !== SchemeType::FIXED_PLAN 
+                    || $schemeType->id == SchemeType::FIXED_PLAN) {
+                    
+                    $dueDate = Carbon::parse($item['date'])->startOfMonth()->addMonths(1)->addDays($dueDuration);
                 }
 
                 $insertData[] = [
