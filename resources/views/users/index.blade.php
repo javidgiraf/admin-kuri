@@ -129,7 +129,7 @@ use App\Services\UserService;
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Scheme</th>
+                                    <th scope="col">Referral Code</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Profile Completion</th>
                                     <th scope="col">Created At</th>
@@ -147,12 +147,8 @@ use App\Services\UserService;
                                         <br>
                                         <p><span {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'class=active' : 'class=inactive') : 'class=inactive' }}> {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'Verified' : 'Not Verified') : 'Not Verified' }} </span></p>
                                     </td>
-                                    <td>
-
-                                        {{ ($user->UserSubscriptions->first()) ?
-
-                                                $user->UserSubscriptions->first()->scheme->title_en : '' }}
-                                    </td>
+                                    
+                                    <td>{{ $user->customer->referrel_code }}</td>
                                     <td>{{ isset($user->customer) ? $user->customer->mobile : '' }}</td>
                                     <td>
                                         <div class="progress mt-1 w-100">
