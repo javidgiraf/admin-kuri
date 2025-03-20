@@ -65,16 +65,16 @@ class HoldSchema extends Command
 
                     $holdDateFixed = $holdDate->copy()->addDays($duration);
                     $holdDateFlexible = $holdDate->copy()->addMonths($flexibility_duration)->addDays($duration);
-                    
-                    $totalFixedSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
-                        $query->where('subscription_id', $userSubscription->id);
-                        $query->where('status', true);
+
+                    $monthKey = $holdDate->format('Y-m');
+                    $existingPayments = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
+                        $query->where('subscription_id', $userSubscription->id)
+                            ->where('status', true);
                     })
-                        ->where('due_date', '>=', $startDate->format('Y-m-d'))
-                        ->where('due_date', '<', $holdDateFixed->format('Y-m-d'))
+                        ->whereRaw("DATE_FORMAT(due_date, '%Y-%m') = ?", [$monthKey])
                         ->where('status', true)
-                        ->sum('scheme_amount');
-                    
+                        ->exists();
+
                     $totalFlexibleSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
                         $query->where('subscription_id', $userSubscription->id);
                         $query->where('status', true);
@@ -85,11 +85,11 @@ class HoldSchema extends Command
                         ->sum('scheme_amount');
 
                     if (
-                        ( 
+                        (
                             $currentDate->format('Y-m') == $holdDate->format('Y-m') &&
                             $currentDate->diffInDays($holdDate) >= $duration &&
                             $userSubscription->scheme->scheme_type_id == SchemeType::FIXED_PLAN &&
-                            $totalFixedSchemeAmount == 0
+                            !$existingPayments
                         ) ||
                         (
                             $currentDate->greaterThanOrEqualTo($holdDateFlexible) &&
