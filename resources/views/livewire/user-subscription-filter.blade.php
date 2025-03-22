@@ -146,9 +146,21 @@
                                 @endif
                                 @endcan
                             </td>
-
+                            @php
+                                $currentDate = now();
+                                $schemeType = App\Models\SchemeType::findOrFail($userSubscription->scheme->scheme_type_id);
+                                $flexibility_duration = $schemeType ? $schemeType->flexibility_duration : 0;
+                                $startDate = \Carbon\Carbon::parse($userSubscription->start_date);
+                                $endSixMonthPeriod = $startDate->copy()->addMonths($flexibility_duration);
+                            @endphp
                             <td>
-                                @if($userSubscription->scheme->scheme_type_id == App\Models\SchemeType::FIXED_PLAN)
+                                @if(
+                                    $userSubscription->scheme->scheme_type_id == App\Models\SchemeType::FIXED_PLAN
+                                    || (
+                                        $currentDate->greaterThanOrEqualTo($endSixMonthPeriod) &&
+                                        $userSubscription->scheme->scheme_type_id != App\Models\SchemeType::FIXED_PLAN
+                                    )
+                                )
                                 {{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->subscribe_amount, 2) }}
                                 @else
                                 {{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->schemeSetting->min_payable_amount, 2) }}

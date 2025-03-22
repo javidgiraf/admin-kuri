@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Deposit;
 use App\Models\DepositPeriod;
 use App\Models\SchemeType;
 use App\Models\SubscriptionHistory;
@@ -64,25 +65,22 @@ class HoldSchema extends Command
                     // Check unpaid periods
 
                     $holdDateFixed = $holdDate->copy()->addDays($duration);
-                    $holdDateFlexible = $holdDate->copy()->addMonths($flexibility_duration)->addDays($duration);
+                    $endSixMonthPeriod = $startDate->copy()->addMonths($flexibility_duration)->addDays($duration);
+                    $holdDateFlexible = ($endSixMonthPeriod->format('Y-m') == $holdDate->format('Y-m')) ? 
+                        $holdDate->copy()->startOfMonth()->addDays($duration) : 
+                        $endSixMonthPeriod->copy()->startOfMonth()->addDays($duration);
 
                     $monthKey = $holdDate->format('Y-m');
-                    $existingPayments = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
-                        $query->where('subscription_id', $userSubscription->id)
-                            ->where('status', true);
-                    })
-                        ->whereRaw("DATE_FORMAT(due_date, '%Y-%m') = ?", [$monthKey])
+                    $existingPayments = Deposit::where('subscription_id', $userSubscription->id)
+                        ->whereRaw("DATE_FORMAT(paid_at, '%Y-%m') = ?", [$monthKey])
                         ->where('status', true)
                         ->exists();
 
-                    $totalFlexibleSchemeAmount = DepositPeriod::whereHas('deposit', function ($query) use ($userSubscription) {
-                        $query->where('subscription_id', $userSubscription->id);
-                        $query->where('status', true);
-                    })
-                        ->where('due_date', '>=', $startDate->format('Y-m-d'))
-                        ->where('due_date', '<', $holdDateFlexible->format('Y-m-d'))
+                    $totalFlexibleSchemeAmount = Deposit::where('subscription_id', $userSubscription->id)
+                        ->where('paid_at', '>=', $startDate->format('Y-m-d'))
+                        ->where('paid_at', '<', $holdDateFlexible->format('Y-m-d'))
                         ->where('status', true)
-                        ->sum('scheme_amount');
+                        ->sum('total_scheme_amount');
 
                     if (
                         (

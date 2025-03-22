@@ -435,9 +435,9 @@ class UserService
             foreach (json_decode($userData['checkdata'], true) as $item) {
                 $dueDate = Carbon::parse($item['date']);
 
-                // if ($dueDate->greaterThan($currentDate)) {
-                //     throw new \Exception('The payment date cannot be after the current date.');
-                // }
+                if ($startDate->format('Y-m') > $currentDate->format('Y-m')) {
+                    throw new \Exception('The payment are not allowed. your payment date start '. $startDate->format('Y-m-d'));
+                }
 
                 // Ensure payments are only made within the first 6 months
                 if ($currentDate->greaterThan($endSixMonthPeriod) && $item['amount'] > round($allowedAmount) && $schemeType->id !== SchemeType::FIXED_PLAN) {
@@ -501,7 +501,7 @@ class UserService
                     'deposit_id' => $deposit->id,
                     'due_date' => $dueDate->format('Y-m-d'),
                     'scheme_amount' => $item['amount'] ?? 0,
-                    'is_due' => now()->greaterThanOrEqualTo($dueDate) ? '1' : '0',
+                    'is_due' => now()->greaterThan($dueDate) ? '0' : '1',
                     'status' => '1',
                     'created_at' => now(),
                     'updated_at' => now(),

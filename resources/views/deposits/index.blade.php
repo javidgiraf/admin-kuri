@@ -124,6 +124,8 @@
         $(".payment_method").removeClass('invalid-feedback').text("");
         $("#transaction_no").removeClass('is-invalid');
         $(".transaction_no").removeClass('invalid-feedback').text("");
+        $("#receipt_upload").removeClass('is-invalid');
+        $(".receipt_upload").removeClass('invalid-feedback').text("");
         //console.log(checkedPermissions);
 
         var user_subscription_id = $("#user_subscription_id").val();
@@ -139,12 +141,12 @@
             return false;
         }
 
-        // if ($("#payment_method").val() != "cash" && $("#transaction_no").val() == "") {
-        //     $("#transaction_no").addClass('is-invalid');
-        //     $(".transaction_no").addClass('invalid-feedback').text("Please enter Transaction No!");
-        //     return false;
+        if ($("#payment_method").val() != "cash" && $("#transaction_no").val() == "") {
+            $("#transaction_no").addClass('is-invalid');
+            $(".transaction_no").addClass('invalid-feedback').text("Please enter Transaction No!");
+            return false;
 
-        // }
+        }
 
 
 
@@ -156,10 +158,12 @@
 
         //     $("#payment_method").val($("#payment_method").val())
         // }
-        // if (!$('#receipt_upload').val()) {
-        //     $("#frmtrasaction").addClass('alert alert-danger').text("Please upload Receipt!");
-        //     return false;
-        // }
+        if (!$('#receipt_upload').val() && $("#transaction_no").val() != "") {
+            
+            $("#receipt_upload").addClass('is-invalid');
+            $(".receipt_upload").addClass('invalid-feedback').text("Please upload a receipt!");
+            return false;
+        }
 
 
         formData.append('subscription_id', user_subscription_id);
